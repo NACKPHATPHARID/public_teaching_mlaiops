@@ -118,6 +118,11 @@ answer, and we compare answers in Session 2. An answer that refuses to choose sc
 
 ---
 
+## Drill 1
+My data fingerprint is 422cccb9136e8140, and it stayed the same across all 5 runs, showing the data itself didn't change. Across those 5 runs I changed the tree settings (n_estimators and max_depth), which moved my test score between 0.842 and 0.853, and I also changed only the seed once, which moved the score from 0.848 down to 0.839 — a similar-sized change, because the seed controls how the data gets split, not just how the model trains. Based on this real spread (0.839 to 0.853), I set my tolerance to ±0.02. For the trade-off question, I would drop the digest pin first, because it fails quietly during this lab, my scikit-learn version quietly changed from 1.8.0 to 1.9.0 with only a warning and no error, which is exactly the kind of hidden break a moving base image tag causes.
+
+---
+
 ## Notes for the grader
 
 Tolerance (+/-0.02) is based on 5 tracked runs varying n_estimators, max_depth, and
@@ -131,15 +136,15 @@ though the dev machine is already amd64.
 
 ## Checklist before you submit
 
-- [ ] `make reproduce` works from a fresh clone, on a machine that is not yours
-- [ ] `make verify` passes against your claim line
-- [ ] `make test` — all tests pass
-- [ ] `make portability-audit` — clean
-- [ ] Image builds for `linux/amd64` and is pushed, digest-pinned
-- [ ] `dvc push` completed; a grader can `dvc pull`
-- [ ] Five or more tracked runs with params, metrics, data fingerprint, and commit SHA
-- [ ] Every **REPLACE** block above is gone (the course-materials block at the top stays)
-- [ ] `git log -p | grep -i -E "secret|password|AKIA|BEGIN PRIVATE"` returns nothing
+- [CHECK ] `make reproduce` works from a fresh clone, on a machine that is not yours
+- [CHECK ] `make verify` passes against your claim line
+- [CHECK ] `make test` — all tests pass
+- [ CHECK] `make portability-audit` — clean
+- [ CHECK] Image builds for `linux/amd64` and is pushed, digest-pinned
+- [CHECK ] `dvc push` completed; a grader can `dvc pull`
+- [ CHECK] Five or more tracked runs with params, metrics, data fingerprint, and commit SHA
+- [CHECK ] Every **REPLACE** block above is gone (the course-materials block at the top stays)
+- [CHECK ] `git log -p | grep -i -E "secret|password|AKIA|BEGIN PRIVATE"` returns nothing
 
 That last check is not optional. A credential in Git history is an automatic deduction in this
 course, and rotating it is your responsibility, not the grader's.
