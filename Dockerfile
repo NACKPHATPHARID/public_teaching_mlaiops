@@ -7,8 +7,7 @@
 #       docker pull python:3.11-slim && docker inspect --format='{{index .RepoDigests 0}}' python:3.11-slim
 #   Then replace the two FROM lines below with the digest form:
 #       FROM python@sha256:<digest> AS builder
-FROM python:3.11-slim AS builder
-
+FROM python@sha256:9534e5a8e315485d4061ed659af0fd78a284c015f9b73661b41d6bab25604534 AS builder
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1 \
     PYTHONDONTWRITEBYTECODE=1
@@ -19,13 +18,13 @@ WORKDIR /build
 COPY requirements.txt ./
 # TODO(Lab 1, Task 2): once requirements.txt carries hashes, add --require-hashes here.
 # It turns a silently-substituted package into a build failure, which is what you want.
-RUN pip install --prefix=/install -r requirements.txt
+RUN pip install --prefix=/install --require-hashes -r requirements.txt
 
-
-FROM python:3.11-slim AS runtime
+FROM python@sha256:9534e5a8e315485d4061ed659af0fd78a284c015f9b73661b41d6bab25604534 AS runtime
 
 # Non-root. A training container has no reason to run as root, and graders check.
 RUN useradd --create-home --uid 10001 runner
+RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONPATH=/app

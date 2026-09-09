@@ -1,37 +1,52 @@
-"""GCP adapter. Implement upload/download/push_image for Lab 1.
+"""GCP adapter. Implements upload/download/push_image for Lab 1 via gcloud + docker CLI.
 
-SDK:  pip install google-cloud-storage google-cloud-aiplatform
-Docs: storage.Client for GCS; Artifact Registry push goes through `docker push` after
-      `gcloud auth configure-docker <region>-docker.pkg.dev`.
-
-Hints for Lab 1:
-  * BLOB_URI looks like gs://bucket/prefix — parse it here, never in src/.
-  * Artifact Registry paths are region-scoped:
-        <region>-docker.pkg.dev/<project>/<repo>/<image>
-    A common first failure is pushing to gcr.io out of habit; it is a different service.
-  * push_image must return the digest reference, not the tag.
-  * GCP calls them labels, not tags, and they must be lowercase with no spaces.
-    cfg.tags(1) already satisfies that constraint — do not "improve" the values.
+Using subprocess + gcloud/docker CLI rather than the google-cloud-storage SDK, since
+the SDK isn't in requirements.txt and this avoids adding an unpinned dependency
+mid-lab. BLOB_URI is parsed here only, per the course rule (never in src/).
 """
 from __future__ import annotations
 
+import subprocess
+from pathlib import Path
 from typing import Any
 
 from cloudlayer.base import CloudAdapter
 
 
 class GcpAdapter(CloudAdapter):
+    def _bucket_and_prefix(self) -> tuple[str, str]:
+        without_scheme = self.cfg.blob_uri.removeprefix("gs://")
+        bucket, _, prefix = without_scheme.partition("/")
+        return bucket, prefix
+
     def upload(self, local_path: str, key: str) -> str:
-        raise NotImplementedError("TODO Lab 1: blob.upload_from_filename, return the gs:// URI")
+        bucket, prefix = self._bucket_and_prefix()
+        dest = f"gs://{bucket}/{prefix}/{key}".replace("//", "/").replace("gs:/", "gs://")
+        subprocess.run(
+            ["gcloud", "storage", "cp", local_path, dest],
+            check=True,
+        )
+        return dest
 
     def download(self, uri: str, local_path: str) -> None:
-        raise NotImplementedError("TODO Lab 1: blob.download_to_filename, creating parents")
+        Path(local_path).parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run(
+            ["gcloud", "storage", "cp", uri, local_path],
+            check=True,
+        )
 
     def push_image(self, local_tag: str) -> str:
-        raise NotImplementedError("TODO Lab 1: configure-docker, push, return repo@sha256:...")
+        image_name, _, tag = local_tag.partition(":")
+        remote_tag = f"{self.cfg.container_registry}/{image_name}:{tag}"
 
-    # submit_training / register_model  -> Lab 2 (Vertex custom training + Model Registry)
-    # deploy / invoke                   -> Lab 3 (Vertex Endpoint)
-    # emit_metric                       -> Lab 4 (Cloud Monitoring time series)
-    # generate                          -> Lab 5 (managed LLM endpoint; read usageMetadata for tokens)
-    # teardown                          -> Lab 5 (filter resources by label)
+        subprocess.run(["docker", "tag", local_tag, remote_tag], check=True)
+        subprocess.run(["docker", "push", remote_tag], check=True)
+
+        out = subprocess.run(
+            ["gcloud", "artifacts", "docker", "images", "describe", remote_tag,
+             "--format=value(image_summary.digest)"],
+            capture_output=True, text=True, check=True,
+        )
+        digest = out.stdout.strip()
+        repo = remote_tag.split(":")[0]
+        return f"{repo}@{digest}"
