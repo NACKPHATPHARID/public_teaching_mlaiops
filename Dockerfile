@@ -34,6 +34,13 @@ WORKDIR /app
 COPY --chown=runner:runner src/ ./src/
 COPY --chown=runner:runner cloudlayer/ ./cloudlayer/
 COPY --chown=runner:runner scripts/ ./scripts/
+COPY --chown=runner:runner .dvc/config ./.dvc/config
+COPY --chown=runner:runner data/raw.dvc ./data/raw.dvc
+
+# dvc pull writes new files under /app/data/ at container runtime, as the
+# non-root `runner` user. /app itself is root-owned by default, so without
+# this, dvc pull fails with a permission error before it ever reaches GCS.
+RUN mkdir -p /app/data && chown -R runner:runner /app
 
 USER runner
 
