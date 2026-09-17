@@ -198,7 +198,12 @@ class GcpAdapter(CloudAdapter):
              "--filter", f"displayName={name}", "--format=value(name)"],
             capture_output=True, text=True, check=True,
         ).stdout.strip()
-        return out.splitlines()[0] if out else None
+        if not out:
+            return None
+        model_id = out.splitlines()[0]
+        if model_id.startswith("projects/"):
+            return model_id
+        return f"projects/{self.cfg.project_id}/locations/{self.cfg.region}/models/{model_id}"
 
     def register_model(self, model_uri: str, name: str, labels: dict[str, Any] | None = None,
                        aliases: list[str] | None = None) -> str:
@@ -226,12 +231,26 @@ class GcpAdapter(CloudAdapter):
         if aliases:
             cmd += ["--version-aliases", ",".join(aliases)]
 
-        out = subprocess.run(cmd, capture_output=True, text=True, check=True)
-        match = re.search(r"/models/[\w-]+@(\d+)", out.stdout + out.stderr) or \
-            re.search(r"Model Version number:\s*(\d+)", out.stdout + out.stderr)
-        if not match:
+        cmd += ["--format=json"]
+        try:
+            out = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(
+                f"gcloud ai models upload failed (exit {e.returncode}):\nSTDOUT:\n{e.stdout}\nSTDERR:\n{e.stderr}"
+            ) from e
+        version = None
+        try:
+            data = json.loads(out.stdout)
+            version = str(data.get("modelVersionId") or data.get("model_version_id") or "") or None
+        except json.JSONDecodeError:
+            pass
+        if not version:
+            match = re.search(r"/models/[\w-]+@(\d+)", out.stdout + out.stderr) or \
+                re.search(r"Model Version number:\s*(\d+)", out.stdout + out.stderr)
+            version = match.group(1) if match else None
+        if not version:
             raise RuntimeError(f"could not parse model version from output:\n{out.stdout}\n{out.stderr}")
-        return match.group(1)
+        return version
 
     def set_model_alias(self, name: str, version: str, alias: str) -> None:
         """Promotion. gcloud has no CLI verb to change aliases on an existing version, so this
