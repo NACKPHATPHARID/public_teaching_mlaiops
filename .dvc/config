@@ -1,4 +1,5 @@
 [core]
     remote = storage
+    no_scm = true
 ['remote "storage"']
     url = gs://itcs355-6688165/itcs355/dvc

@@ -11,3 +11,8 @@ __pycache__/
 .pytest_cache/
 cloud.env
 instructor/
+
+# Lab 2: dvc pull needs the pointer file and remote config in the image,
+# even though the excluded data/ directory itself must not be baked in.
+!data/raw.dvc
+!.dvc/config
