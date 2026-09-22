@@ -11,7 +11,7 @@ from pathlib import Path
 
 import joblib
 import numpy as np
-from sklearn.metrics import brier_score_loss, roc_auc_score
+from sklearn.metrics import roc_auc_score
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src import config, data, seeds  # noqa: E402
@@ -36,8 +36,6 @@ per_row = {  # per-request values a live monitor could average over a window
 }
 
 print(f"{'metric':24s} {'v2':>9s} {'v3':>9s} {'gap':>9s}")
-for name, p in models.items():
-    pass
 p2, p3 = models["v2 (prod)"], models["v3 (canary)"]
 print(f"{'ROC-AUC (needs label)':24s} {roc_auc_score(y, p2):9.4f} {roc_auc_score(y, p3):9.4f} "
       f"{roc_auc_score(y, p3) - roc_auc_score(y, p2):+9.4f}")
