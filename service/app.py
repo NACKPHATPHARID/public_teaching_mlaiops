@@ -29,7 +29,7 @@ log = logging.getLogger("service")
 STATE: dict[str, Any] = {"model": None, "version": os.environ.get("MODEL_VERSION", "unknown")}
 
 
-def _load_model():
+def _load_model_raw():
     """Load once, at startup. Never per request.
 
     Loading per request is the commonest cause of a p99 that looks nothing like p50, and
@@ -71,6 +71,16 @@ def _load_model():
             "No model available. Set MODEL_REGISTRY_NAME and MODEL_VERSION, or MODEL_PATH."
         )
     return joblib.load(path)
+
+
+def _load_model():
+    """Load once, then pin scoring to a single thread. The model was trained with n_jobs=-1,
+    which on every one-row request spins up and joins a thread pool: measured 35.9 ms per
+    prediction as trained vs 7.9 ms with n_jobs=1. Same predictions; serving-only setting."""
+    model = _load_model_raw()
+    if hasattr(model, "n_jobs"):
+        model.n_jobs = 1
+    return model
 
 
 @asynccontextmanager
