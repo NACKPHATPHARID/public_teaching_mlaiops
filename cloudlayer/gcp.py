@@ -399,7 +399,9 @@ class GcpAdapter(CloudAdapter):
             "--service-account", self.cfg.identity_ref,
             "--set-env-vars", ",".join(f"{k}={v}" for k, v in env.items()),
             "--cpu", cpu, "--memory", memory, "--port", "8080",
-            "--min-instances", "0", "--max-instances", "3",
+            "--min-instances", os.environ.get("SERVE_MIN_INSTANCES", "0"), "--max-instances", "3",
+            # CPU-bound model: few requests per instance, or they queue behind one busy vCPU.
+            "--concurrency", "4",
             "--labels", labels, "--tag", f"model-v{model_ref}",
             # Readiness, not liveness: no traffic until the model has actually loaded.
             "--startup-probe",
