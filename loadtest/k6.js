@@ -37,8 +37,10 @@ const payload = JSON.stringify({
 
 export default function () {
   const res = http.post(__ENV.TARGET, payload, {
-    headers: { 'Content-Type': 'application/json' },
-    ...(__ENV.TOKEN ? { Authorization: `Bearer ${__ENV.TOKEN}` } : {}),
+    headers: {
+      'Content-Type': 'application/json',
+      ...(__ENV.TOKEN ? { Authorization: `Bearer ${__ENV.TOKEN}` } : {}),
+    },
   });
   latency.add(res.timings.duration);
   failures.add(res.status !== 200);
