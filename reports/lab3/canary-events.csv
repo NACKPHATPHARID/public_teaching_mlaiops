@@ -1,0 +1,7 @@
+utc,event,detail
+2026-09-22T15:57:25+00:00,baseline start,100% model-v2
+2026-09-22T16:00:26+00:00,baseline done,n=21342 r0=2.3662%
+2026-09-22T16:01:04+00:00,SPLIT 90/10,
+2026-09-22T16:03:40+00:00,ALARM,n=25463 alert_rate=2.0736% threshold=2.0805% detection_s=156
+2026-09-22T16:04:18+00:00,ROLLBACK done,100% model-v2
+2026-09-22T16:06:19+00:00,traffic stopped,

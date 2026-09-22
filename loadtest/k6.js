@@ -20,9 +20,10 @@ export const options = {
   thresholds: {
     // TODO(Lab 3): set YOUR p95 target here, BEFORE you measure.
     // A target chosen after seeing the numbers is not a target, and this is graded.
-    'predict_latency_ms': ['p(95)<200'],
+    'predict_latency_ms': ['p(95)<250'],
     'predict_failures': ['rate<0.01'],
   },
+  summaryTrendStats: ['avg', 'min', 'med', 'p(95)', 'p(99)', 'max'],
 };
 
 const payload = JSON.stringify({
@@ -36,7 +37,10 @@ const payload = JSON.stringify({
 
 export default function () {
   const res = http.post(__ENV.TARGET, payload, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(__ENV.TOKEN ? { Authorization: `Bearer ${__ENV.TOKEN}` } : {}),
+    },
   });
   latency.add(res.timings.duration);
   failures.add(res.status !== 200);

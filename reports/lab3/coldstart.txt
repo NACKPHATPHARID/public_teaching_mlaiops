@@ -1,0 +1,8 @@
+cold: 0.273792s  status 200
+warm1: 0.096791s  status 200
+warm2: 0.099863s  status 200
+# ^ 21:38 run, only ~3 min idle: instance still warm; the 0.27 s is TLS connection setup, NOT a cold start
+# 2026-09-22T15:27:14Z after ~50 min idle
+cold: 16.626227s  status 200
+warm1: 0.129232s  status 200
+warm2: 0.094353s  status 200

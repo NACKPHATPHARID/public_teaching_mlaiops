@@ -1,0 +1,5 @@
+# 2026-09-22T16:15:39Z make teardown LAB=3
+['run-service:itcs355-serve']
+Listed 0 items.
+# 2026-09-22T16:57:57Z final make teardown LAB=3 (after hashed-deps deploy + smoke)
+Listed 0 items.

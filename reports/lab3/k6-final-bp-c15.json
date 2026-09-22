@@ -1,0 +1,160 @@
+{
+    "metrics": {
+        "vus": {
+            "value": 15,
+            "min": 15,
+            "max": 15
+        },
+        "vus_max": {
+            "value": 15,
+            "min": 15,
+            "max": 15
+        },
+        "http_req_tls_handshaking": {
+            "avg": 0.10729182292970847,
+            "min": 0,
+            "med": 0,
+            "p(95)": 0,
+            "p(99)": 0,
+            "max": 50.632143
+        },
+        "iteration_duration": {
+            "max": 221.43922,
+            "avg": 80.58755480414966,
+            "min": 45.604969,
+            "med": 74.394433,
+            "p(95)": 128.880411,
+            "p(99)": 150.91607430000025
+        },
+        "iterations": {
+            "rate": 184.83059205255682,
+            "count": 5591
+        },
+        "data_received": {
+            "count": 1499354,
+            "rate": 49566.53327067954
+        },
+        "http_req_duration": {
+            "avg": 80.58980654069047,
+            "min": 45.458302,
+            "med": 74.208952,
+            "p(95)": 129.0606155,
+            "p(99)": 153.30385600000005,
+            "max": 260.670122
+        },
+        "http_req_waiting": {
+            "p(95)": 128.7955355,
+            "p(99)": 153.09662390000003,
+            "max": 260.168612,
+            "avg": 80.31871325093915,
+            "min": 45.273732,
+            "med": 73.955605
+        },
+        "http_req_connecting": {
+            "max": 35.43379,
+            "avg": 0.06221471060633158,
+            "min": 0,
+            "med": 0,
+            "p(95)": 0,
+            "p(99)": 0
+        },
+        "http_req_duration{expected_response:true}": {
+            "med": 74.208952,
+            "p(95)": 129.0606155,
+            "p(99)": 153.30385600000005,
+            "max": 260.670122,
+            "avg": 80.58980654069047,
+            "min": 45.458302
+        },
+        "http_req_sending": {
+            "p(99)": 0.2737829,
+            "max": 0.633435,
+            "avg": 0.12967432534430332,
+            "min": 0.052066,
+            "med": 0.122612,
+            "p(95)": 0.2094425
+        },
+        "http_req_receiving": {
+            "med": 0.112628,
+            "p(95)": 0.359933,
+            "p(99)": 0.6295377000000001,
+            "max": 2.621904,
+            "avg": 0.14141896440708232,
+            "min": 0.019661
+        },
+        "http_reqs": {
+            "count": 5591,
+            "rate": 184.83059205255682
+        },
+        "http_req_blocked": {
+            "p(99)": 0.000792,
+            "max": 81.833287,
+            "avg": 0.1841129381148125,
+            "min": 0.000197,
+            "med": 0.000305,
+            "p(95)": 0.000497
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 5591,
+            "value": 0
+        },
+        "predict_latency_ms": {
+            "max": 260.670122,
+            "avg": 80.58980654069047,
+            "min": 45.458302,
+            "med": 74.208952,
+            "p(95)": 129.0606155,
+            "p(99)": 153.30385600000005,
+            "thresholds": {
+                "p(95)<250": false
+            }
+        },
+        "predict_failures": {
+            "passes": 0,
+            "fails": 5591,
+            "thresholds": {
+                "rate<0.01": false
+            },
+            "value": 0
+        },
+        "data_sent": {
+            "count": 1319877,
+            "rate": 43633.27622009525
+        },
+        "checks": {
+            "fails": 0,
+            "passes": 16773,
+            "value": 1
+        }
+    },
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "status is 200": {
+                    "path": "::status is 200",
+                    "id": "6210a8cd14cd70477eba5c5e4cb3fb5f",
+                    "passes": 5591,
+                    "fails": 0,
+                    "name": "status is 200"
+                },
+                "probability present": {
+                    "name": "probability present",
+                    "path": "::probability present",
+                    "id": "094bdf8b907d13f6c29f89d21d4c5694",
+                    "passes": 5591,
+                    "fails": 0
+                },
+                "version reported": {
+                    "name": "version reported",
+                    "path": "::version reported",
+                    "id": "434d64ee853698f49199ff86c02cce31",
+                    "passes": 5591,
+                    "fails": 0
+                }
+            }
+    }
+}

@@ -1,0 +1,25 @@
+[2026-09-22 22:36:15,447] DESKTOP-2HRGNOF/INFO/locust.main: Starting Locust 2.46.6
+[2026-09-22 22:36:15,448] DESKTOP-2HRGNOF/INFO/locust.main: Run time limit set to 60 seconds
+[2026-09-22 22:36:15,449] DESKTOP-2HRGNOF/INFO/locust.runners: Ramping to 10 users at a rate of 10.00 per second
+[2026-09-22 22:36:15,451] DESKTOP-2HRGNOF/INFO/locust.runners: All users spawned: {"BatchVsSingleUser": 10} (10 total users)
+[2026-09-22 22:37:15,413] DESKTOP-2HRGNOF/INFO/locust.main: --run-time limit reached, shutting down
+[2026-09-22 22:37:15,445] DESKTOP-2HRGNOF/INFO/locust.main: Shutting down (exit code 0)
+Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+POST     /predict (inside 50-loop)                                                       7239     0(0.00%) |     80      47   12462     61 |  120.66        0.00
+POST     /predict/batch (50 rows)                                                         140     0(0.00%) |     73      52     158     65 |    2.33        0.00
+COMPARE  1 batch of 50, total                                                             140     0(0.00%) |     73      52     158     65 |    2.33        0.00
+COMPARE  50 singles, total                                                                140     0(0.00%) |   4035    2771   16014   3400 |    2.33        0.00
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+         Aggregated                                                                      7659     0(0.00%) |    152      47   16014     61 |  127.66        0.00
+
+Response time percentiles (approximated)
+Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+POST     /predict (inside 50-loop)                                                              61     70     79     84     96    110    120    130   7800  12000  12000   7239
+POST     /predict/batch (50 rows)                                                               65     77     85     89    100    110    140    140    160    160    160    140
+COMPARE  1 batch of 50, total                                                                   65     77     85     89    100    110    140    140    160    160    160    140
+COMPARE  50 singles, total                                                                    3400   3600   3600   3700   3800  11000  16000  16000  16000  16000  16000    140
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+         Aggregated                                                                             61     71     80     86     99    110    180   3400  12000  16000  16000   7659
+

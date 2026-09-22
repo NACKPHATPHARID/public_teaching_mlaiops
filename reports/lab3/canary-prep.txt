@@ -1,0 +1,13 @@
+test rows: 1200   positive rate: 0.119
+
+metric                          v2        v3       gap
+ROC-AUC (needs label)       0.8533    0.8442   -0.0090
+mean predicted p            0.1202    0.1211   +0.0010
+share with p > 0.5          0.0233    0.0000   -0.0233
+Brier (needs label)         0.0803    0.0870   +0.0067
+
+Requests needed for the blended metric to move 3 standard errors:
+metric                     at 90/10   at 50/50
+mean predicted p           11728365     469135
+share with p > 0.5            19061        762
+Brier (needs label)          753435      30137

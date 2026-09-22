@@ -1,0 +1,14 @@
+# Source of truth for the SERVING image. Compile WITH HASHES, using Python 3.11
+# (the same version as the python:3.11-slim base image):
+#   pip-compile --generate-hashes --output-file=requirements-serve.txt requirements-serve.in
+# Commit both files.
+fastapi==0.141.1
+uvicorn==0.34.0
+pydantic==2.13.5
+pandas==3.0.2
+numpy==2.4.4
+scikit-learn==1.8.0
+mlflow==3.16.0
+joblib==1.4.2
+# imported directly by cloudlayer/gcp.py; previously only present via mlflow
+PyYAML==6.0.3

@@ -3,11 +3,15 @@
 Using subprocess + gcloud/docker CLI rather than the google-cloud-storage SDK, since
 the SDK isn't in requirements.txt and this avoids adding an unpinned dependency
 mid-lab. BLOB_URI is parsed here only, per the course rule (never in src/).
+
+Lab 3: the serving container has no gcloud, so download() falls back to the GCS REST API
+with a token from the Cloud Run metadata server. Still no SDK, still stdlib only.
 """
 from __future__ import annotations
 
 import json
 import re
+import shutil
 import subprocess
 import time
 from pathlib import Path
@@ -35,10 +39,15 @@ class GcpAdapter(CloudAdapter):
 
     def download(self, uri: str, local_path: str) -> None:
         Path(local_path).parent.mkdir(parents=True, exist_ok=True)
-        subprocess.run(
-            ["gcloud", "storage", "cp", uri, local_path],
-            check=True,
-        )
+        if shutil.which("gcloud"):
+            subprocess.run(["gcloud", "storage", "cp", uri, local_path], check=True)
+            return
+        # Inside the serving container there is no gcloud: same operation over GCS REST.
+        import urllib.parse
+        bucket, _, obj = uri.removeprefix("gs://").partition("/")
+        url = (f"https://storage.googleapis.com/storage/v1/b/{bucket}/o/"
+               f"{urllib.parse.quote(obj, safe='')}?alt=media")
+        Path(local_path).write_bytes(self._get(url, self._access_token(), raw=True))
 
     def download_key(self, key: str, local_path: str) -> None:
         """Like download(), but takes a key relative to BLOB_URI instead of a full URI — for
@@ -274,10 +283,10 @@ class GcpAdapter(CloudAdapter):
         with urllib.request.urlopen(req, timeout=30) as resp:
             resp.read()
 
-    # --- teardown (minimal, Lab 2 scope) ----------------------------------------------------------
+    # --- teardown (Lab 2 jobs + Lab 3 serving) ---------------------------------------------------
     def teardown(self, tags: dict[str, str]) -> list[str]:
-        """Cancel still-running custom jobs carrying these labels. Finished jobs cost nothing;
-        the registered model and bucket stay — Lab 3 needs them."""
+        """Cancel still-running custom jobs and delete Cloud Run services carrying these labels.
+        Finished jobs cost nothing; the registered model and bucket stay."""
         flt = " AND ".join(f"labels.{self._label(k)}={self._label(v)}" for k, v in tags.items())
         out = subprocess.run(
             ["gcloud", "ai", "custom-jobs", "list", "--region", self.cfg.region,
@@ -290,4 +299,135 @@ class GcpAdapter(CloudAdapter):
             if state not in self.TERMINAL_STATES:
                 self.cancel_training(job_id)
                 cancelled.append(job_id)
+
+        # Lab 3: a forgotten endpoint is the most expensive mistake in this course.
+        run_flt = " AND ".join(
+            f"metadata.labels.{self._label(k)}={self._label(v)}" for k, v in tags.items())
+        services = subprocess.run(
+            ["gcloud", "run", "services", "list", "--region", self.cfg.region,
+             "--filter", run_flt, "--format=value(metadata.name)"],
+            capture_output=True, text=True, check=True,
+        ).stdout.split()
+        for svc in services:
+            subprocess.run(["gcloud", "run", "services", "delete", svc,
+                            "--region", self.cfg.region, "--quiet"], check=True)
+            cancelled.append(f"run-service:{svc}")
         return cancelled
+
+    # =============================================================================================
+    # Lab 3 — serving (Cloud Run)
+    # =============================================================================================
+    # deploy() resolves the registry version to an artifact URI on the laptop and passes it to
+    # the container as MODEL_ARTIFACT_URI — the same pattern Vertex uses with AIP_STORAGE_URI.
+    # The container fetches it once, at startup, through download().
+
+    def _access_token(self) -> str:
+        """Cloud Run metadata server when running in GCP; gcloud on a laptop."""
+        import urllib.request
+        try:
+            req = urllib.request.Request(
+                "http://metadata.google.internal/computeMetadata/v1/"
+                "instance/service-accounts/default/token",
+                headers={"Metadata-Flavor": "Google"},
+            )
+            with urllib.request.urlopen(req, timeout=2) as resp:
+                return json.loads(resp.read())["access_token"]
+        except Exception:
+            return subprocess.run(["gcloud", "auth", "print-access-token"],
+                                  capture_output=True, text=True, check=True).stdout.strip()
+
+    def _get(self, url: str, token: str, raw: bool = False):
+        import urllib.request
+        req = urllib.request.Request(url, headers={"Authorization": f"Bearer {token}"})
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            body = resp.read()
+        return body if raw else json.loads(body)
+
+    def _model_artifact_uri(self, name: str, version: str) -> str:
+        """Vertex registry: display name + version -> gs:// directory holding model.joblib."""
+        import urllib.parse
+        token = self._access_token()
+        host = f"https://{self.cfg.region}-aiplatform.googleapis.com/v1"
+        parent = f"projects/{self.cfg.project_id}/locations/{self.cfg.region}"
+        flt = urllib.parse.quote(f'display_name="{name}"')
+        models = self._get(f"{host}/{parent}/models?filter={flt}", token).get("models", [])
+        if not models:
+            raise RuntimeError(f"no model named {name!r} in the Vertex registry")
+        model = models[0]["name"].split("@")[0]
+        return self._get(f"{host}/{model}@{version}", token)["artifactUri"]
+
+    def _run(self, *args: str) -> str:
+        cmd = ["gcloud", "run", *args, "--region", self.cfg.region,
+               "--project", self.cfg.project_id]
+        out = subprocess.run(cmd, capture_output=True, text=True)
+        if out.returncode != 0:
+            raise RuntimeError(f"{' '.join(cmd)}\n{out.stderr}")
+        return out.stdout.strip()
+
+    def _service_url(self, endpoint: str) -> str:
+        return self._run("services", "describe", endpoint, "--format=value(status.url)")
+
+    def deploy(self, model_ref: str, endpoint: str, instance: str) -> str:
+        """model_ref = registry version ('2'); endpoint = Cloud Run service name;
+        instance = 'CPU/MEMORY', e.g. '1/1Gi'. The first deploy takes 100% of traffic;
+        later deploys arrive with 0% under tag model-v<version>, ready for set_traffic()."""
+        import os
+
+        local_tag = os.environ.get("SERVE_IMAGE")
+        if not local_tag:
+            raise RuntimeError("set SERVE_IMAGE=itcs355-serve:<tag> (make deploy does this)")
+        image = self.push_image(local_tag)  # digest-pinned reference
+        cpu, _, memory = instance.partition("/")
+
+        slots = ("CLOUD_PROVIDER", "PROJECT_ID", "REGION", "BLOB_URI", "CONTAINER_REGISTRY",
+                 "MLFLOW_TRACKING_URI", "MODEL_REGISTRY_NAME", "IDENTITY_REF")
+        env = {k: os.environ[k] for k in slots}
+        env["MODEL_VERSION"] = model_ref
+        env["MODEL_ARTIFACT_URI"] = self._model_artifact_uri(
+            env["MODEL_REGISTRY_NAME"], model_ref).rstrip("/") + "/model.joblib"
+        labels = ",".join(f"{self._label(k)}={self._label(v)}"
+                          for k, v in self.cfg.tags(3).items())
+
+        try:
+            self._service_url(endpoint)
+            exists = True
+        except RuntimeError:
+            exists = False
+
+        args = [
+            "deploy", endpoint, "--image", image,
+            "--service-account", self.cfg.identity_ref,
+            "--set-env-vars", ",".join(f"{k}={v}" for k, v in env.items()),
+            "--cpu", cpu, "--memory", memory, "--port", "8080",
+            "--min-instances", os.environ.get("SERVE_MIN_INSTANCES", "0"), "--max-instances", "3",
+            # CPU-bound model: few requests per instance, or they queue behind one busy vCPU.
+            "--concurrency", "4",
+            "--labels", labels, "--tag", f"model-v{model_ref}",
+            # Readiness, not liveness: no traffic until the model has actually loaded.
+            "--startup-probe",
+            "httpGet.path=/ready,httpGet.port=8080,periodSeconds=2,"
+            "failureThreshold=60,timeoutSeconds=2",
+            "--no-allow-unauthenticated", "--quiet",
+        ]
+        if exists:
+            args.append("--no-traffic")
+        self._run(*args)
+        return self._service_url(endpoint)
+
+    def invoke(self, endpoint: str, payload: dict[str, Any]) -> dict[str, Any]:
+        import urllib.request
+        url = endpoint if endpoint.startswith("https://") else self._service_url(endpoint)
+        token = subprocess.run(["gcloud", "auth", "print-identity-token"],
+                               capture_output=True, text=True, check=True).stdout.strip()
+        req = urllib.request.Request(
+            url.rstrip("/") + "/predict", method="POST", data=json.dumps(payload).encode(),
+            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            return json.loads(resp.read())
+
+    def set_traffic(self, endpoint: str, split: dict[str, int]) -> str:
+        """Canary and rollback. split maps tag -> percent, e.g. {'model-v2': 90, 'model-v3': 10}."""
+        self._run("services", "update-traffic", endpoint, "--to-tags",
+                  ",".join(f"{t}={p}" for t, p in split.items()), "--quiet")
+        return self._run("services", "describe", endpoint, "--format=yaml(status.traffic)")

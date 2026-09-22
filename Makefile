@@ -134,3 +134,14 @@ cost: ## Build the cost report
 
 swap-check: ## Prove the portability seam against a second provider
 	python scripts/portability_swap_check.py --second-provider $(SECOND)
+
+# --- Lab 3 -------------------------------------------------------------------
+SERVICE ?= itcs355-serve
+MODEL_VERSION ?= 2
+SERVE_INSTANCE ?= 1/1Gi
+
+deploy: serve-image ## Push serving image and deploy MODEL_VERSION to Cloud Run
+	SERVE_IMAGE=itcs355-serve:$(TAG) python scripts/deploy_lab3.py $(MODEL_VERSION) $(SERVICE) $(SERVE_INSTANCE)
+
+smoke: ## Three known payloads through adapter.invoke()
+	python scripts/smoke_lab3.py $(SERVICE)

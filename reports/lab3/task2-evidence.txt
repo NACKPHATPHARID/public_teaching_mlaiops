@@ -1,0 +1,28 @@
+## /health
+HTTP/2 200 
+content-type: application/json
+x-request-id: 4dad378a-6337-43cc-9fdb-4fb04241f655
+x-model-version: 2
+x-cloud-trace-context: 32b7c9edde9c5358838be64644ad91ac;o=1
+date: Tue, 22 Sep 2026 09:42:01 GMT
+server: Google Frontend
+content-length: 18
+alt-svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+
+{"status":"alive"}
+## /ready
+HTTP/2 200 
+content-type: application/json
+x-request-id: d34d43f9-7bf7-46ab-8412-7534e49b1fd8
+x-model-version: 2
+x-cloud-trace-context: 6c72da3700ce7992c02a20b61c525f26
+date: Tue, 22 Sep 2026 09:42:01 GMT
+server: Google Frontend
+content-length: 38
+alt-svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+
+{"status":"ready","model_version":"2"}
+## bad input
+422
+## no token
+403

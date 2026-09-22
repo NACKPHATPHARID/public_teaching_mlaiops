@@ -1,0 +1,44 @@
+
+
+  █ THRESHOLDS 
+
+    predict_failures
+    ✓ 'rate<0.01' rate=0.00%
+
+    predict_latency_ms
+    ✗ 'p(95)<250' p(95)=314.851534
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 20862   345.528719/s
+    checks_succeeded...: 100.00% 20862 out of 20862
+    checks_failed......: 0.00%   0 out of 20862
+
+    ✓ status is 200
+    ✓ probability present
+    ✓ version reported
+
+    CUSTOM
+    predict_failures...............: 0.00%  0 out of 6954
+    predict_latency_ms.............: avg=129.829994 min=46.015675 med=82.587791 p(95)=314.851534 p(99)=425.345962 max=598.890841
+
+    HTTP
+    http_req_duration..............: avg=129.82ms   min=46.01ms   med=82.58ms   p(95)=314.85ms   p(99)=425.34ms   max=598.89ms  
+      { expected_response:true }...: avg=129.82ms   min=46.01ms   med=82.58ms   p(95)=314.85ms   p(99)=425.34ms   max=598.89ms  
+    http_req_failed................: 0.00%  0 out of 6954
+    http_reqs......................: 6954   115.17624/s
+
+    EXECUTION
+    iteration_duration.............: avg=129.54ms   min=46.2ms    med=82.65ms   p(95)=314.25ms   p(99)=427.92ms   max=599ms     
+    iterations.....................: 6954   115.17624/s
+    vus............................: 15     min=15        max=15
+    vus_max........................: 15     min=15        max=15
+
+    NETWORK
+    data_received..................: 1.8 MB 30 kB/s
+    data_sent......................: 1.6 MB 27 kB/s
+
+
+
+time="2026-09-22T14:13:29Z" level=error msg="thresholds on metrics 'predict_latency_ms' have been crossed"
