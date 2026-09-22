@@ -370,7 +370,7 @@ class GcpAdapter(CloudAdapter):
     def deploy(self, model_ref: str, endpoint: str, instance: str) -> str:
         """model_ref = registry version ('2'); endpoint = Cloud Run service name;
         instance = 'CPU/MEMORY', e.g. '1/1Gi'. The first deploy takes 100% of traffic;
-        later deploys arrive with 0% under tag v<version>, ready for set_traffic()."""
+        later deploys arrive with 0% under tag model-v<version>, ready for set_traffic()."""
         import os
 
         local_tag = os.environ.get("SERVE_IMAGE")
@@ -400,7 +400,7 @@ class GcpAdapter(CloudAdapter):
             "--set-env-vars", ",".join(f"{k}={v}" for k, v in env.items()),
             "--cpu", cpu, "--memory", memory, "--port", "8080",
             "--min-instances", "0", "--max-instances", "3",
-            "--labels", labels, "--tag", f"v{model_ref}",
+            "--labels", labels, "--tag", f"model-v{model_ref}",
             # Readiness, not liveness: no traffic until the model has actually loaded.
             "--startup-probe",
             "httpGet.path=/ready,httpGet.port=8080,periodSeconds=2,"
@@ -425,7 +425,7 @@ class GcpAdapter(CloudAdapter):
             return json.loads(resp.read())
 
     def set_traffic(self, endpoint: str, split: dict[str, int]) -> str:
-        """Canary and rollback. split maps tag -> percent, e.g. {'v2': 90, 'v3': 10}."""
+        """Canary and rollback. split maps tag -> percent, e.g. {'model-v2': 90, 'model-v3': 10}."""
         self._run("services", "update-traffic", endpoint, "--to-tags",
                   ",".join(f"{t}={p}" for t, p in split.items()), "--quiet")
         return self._run("services", "describe", endpoint, "--format=yaml(status.traffic)")
