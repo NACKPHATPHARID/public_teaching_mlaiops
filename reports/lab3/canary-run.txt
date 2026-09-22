@@ -1,0 +1,86 @@
+status:
+  traffic:
+  - percent: 100
+    revisionName: itcs355-serve-00019-gez
+    tag: model-v2
+    url: https://model-v2---itcs355-serve-wbdtxulxia-as.a.run.app
+  - revisionName: itcs355-serve-00020-coy
+    tag: model-v3
+    url: https://model-v3---itcs355-serve-wbdtxulxia-as.a.run.app
+[2026-09-22T15:57:25+00:00] baseline start 100% model-v2
+[2026-09-22T16:00:26+00:00] baseline done n=21342 r0=2.3662%
+[2026-09-22T16:01:04+00:00] SPLIT 90/10 
+status:
+  traffic:
+  - percent: 90
+    revisionName: itcs355-serve-00019-gez
+    tag: model-v2
+    url: https://model-v2---itcs355-serve-wbdtxulxia-as.a.run.app
+  - percent: 10
+    revisionName: itcs355-serve-00020-coy
+    tag: model-v3
+    url: https://model-v3---itcs355-serve-wbdtxulxia-as.a.run.app
+  +   5s  n=   820  alert_rate=1.8293%  alarm_below=0.7739%
+  +  10s  n=  1636  alert_rate=2.0171%  alarm_below=1.2389%
+  +  15s  n=  2441  alert_rate=2.0893%  alarm_below=1.4433%
+  +  20s  n=  3257  alert_rate=1.9650%  alarm_below=1.5672%
+  +  25s  n=  4104  alert_rate=1.9493%  alarm_below=1.6544%
+  +  30s  n=  4916  alert_rate=1.9325%  alarm_below=1.7159%
+  +  35s  n=  5731  alert_rate=1.9543%  alarm_below=1.7639%
+  +  40s  n=  6546  alert_rate=1.9554%  alarm_below=1.8026%
+  +  45s  n=  7366  alert_rate=2.0771%  alarm_below=1.8349%
+  +  50s  n=  8178  alert_rate=2.1154%  alarm_below=1.8620%
+  +  55s  n=  8985  alert_rate=2.0701%  alarm_below=1.8852%
+  +  60s  n=  9787  alert_rate=2.0537%  alarm_below=1.9053%
+  +  65s  n= 10597  alert_rate=2.0572%  alarm_below=1.9233%
+  +  70s  n= 11432  alert_rate=2.0644%  alarm_below=1.9398%
+  +  75s  n= 12247  alert_rate=2.0576%  alarm_below=1.9542%
+  +  80s  n= 13066  alert_rate=2.0588%  alarm_below=1.9673%
+  +  85s  n= 13883  alert_rate=2.0529%  alarm_below=1.9792%
+  +  90s  n= 14703  alert_rate=2.0336%  alarm_below=1.9902%
+  +  95s  n= 15499  alert_rate=2.0259%  alarm_below=2.0000%
+  + 100s  n= 16318  alert_rate=2.0162%  alarm_below=2.0093%
+  + 105s  n= 17141  alert_rate=2.0244%  alarm_below=2.0179%
+  + 110s  n= 17972  alert_rate=2.0421%  alarm_below=2.0261%
+  + 115s  n= 18803  alert_rate=2.0901%  alarm_below=2.0337%
+  + 120s  n= 19618  alert_rate=2.1205%  alarm_below=2.0407%
+  + 125s  n= 20451  alert_rate=2.0879%  alarm_below=2.0474%
+  + 130s  n= 21291  alert_rate=2.0666%  alarm_below=2.0537%
+  + 135s  n= 22126  alert_rate=2.0835%  alarm_below=2.0597%
+  + 140s  n= 22947  alert_rate=2.0918%  alarm_below=2.0652%
+  + 145s  n= 23775  alert_rate=2.0820%  alarm_below=2.0705%
+  + 151s  n= 24617  alert_rate=2.0799%  alarm_below=2.0756%
+  + 156s  n= 25463  alert_rate=2.0736%  alarm_below=2.0805%
+[2026-09-22T16:03:40+00:00] ALARM n=25463 alert_rate=2.0736% threshold=2.0805% detection_s=156
+[2026-09-22T16:04:18+00:00] ROLLBACK done 100% model-v2
+status:
+  traffic:
+  - percent: 100
+    revisionName: itcs355-serve-00019-gez
+    tag: model-v2
+    url: https://model-v2---itcs355-serve-wbdtxulxia-as.a.run.app
+  - revisionName: itcs355-serve-00020-coy
+    tag: model-v3
+    url: https://model-v3---itcs355-serve-wbdtxulxia-as.a.run.app
+[2026-09-22T16:06:19+00:00] traffic stopped 
+
+Evidence: 30-second windows (model_version used here only, after the fact)
+window start (UTC)          n     v2     v3  v3 share  alert rate  errors
+2026-09-22T15:57:25+00:00   1649   1649      0      0.0%       1.88%       0
+2026-09-22T15:57:55+00:00   2811   2811      0      0.0%       2.77%       0
+2026-09-22T15:58:25+00:00   4562   4562      0      0.0%       2.39%       0
+2026-09-22T15:58:55+00:00   4641   4641      0      0.0%       2.37%       0
+2026-09-22T15:59:25+00:00   4605   4605      0      0.0%       1.95%       0
+2026-09-22T15:59:55+00:00   4665   4665      0      0.0%       2.49%       0
+2026-09-22T16:00:25+00:00   4519   4357    162      3.6%       2.15%       0
+2026-09-22T16:00:55+00:00   4846   4362    484     10.0%       1.77%       0
+2026-09-22T16:01:25+00:00   4894   4393    501     10.2%       2.19%       0
+2026-09-22T16:01:55+00:00   4873   4373    500     10.3%       1.99%       0
+2026-09-22T16:02:25+00:00   4897   4419    478      9.8%       2.04%       0
+2026-09-22T16:02:55+00:00   4951   4466    485      9.8%       2.16%       0
+2026-09-22T16:03:25+00:00   5000   4500    500     10.0%       2.24%       0
+2026-09-22T16:03:55+00:00   4646   4592     54      1.2%       2.45%       0
+2026-09-22T16:04:25+00:00   4745   4745      0      0.0%       2.07%       0
+2026-09-22T16:04:55+00:00   4761   4761      0      0.0%       2.35%       0
+2026-09-22T16:05:25+00:00   4790   4790      0      0.0%       1.96%       0
+2026-09-22T16:05:55+00:00   3690   3690      0      0.0%       2.11%       0
