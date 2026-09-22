@@ -1,0 +1,15 @@
+2026-09-22T09:42:02.121356Z		The request was not authenticated. Either allow unauthenticated invocations or set the proper Authorization header. Empty Authorization header value. Read more at https://cloud.google.com/run/docs/securing/authenticating Additional troubleshooting documentation can be found at: https://cloud.google.com/run/docs/troubleshooting#unauthorized-client
+2026-09-22T09:42:02.026318Z		INFO:     169.254.169.126:33660 - "POST /predict HTTP/1.1" 422 Unprocessable Entity
+2026-09-22T09:42:02.026081Z	latency_ms=1.34;model_version=2;path=/predict;request_id=df75eb93-9d6b-433a-b2ab-9c67a439f449;status=422	
+2026-09-22T09:42:02.020977Z		
+2026-09-22T09:42:01.924292Z		INFO:     169.254.169.126:33658 - "GET /ready HTTP/1.1" 200 OK
+2026-09-22T09:42:01.924198Z	latency_ms=0.87;model_version=2;path=/ready;request_id=d34d43f9-7bf7-46ab-8412-7534e49b1fd8;status=200	
+2026-09-22T09:42:01.919648Z		
+2026-09-22T09:42:01.806690Z		INFO:     169.254.169.126:33642 - "GET /health HTTP/1.1" 200 OK
+2026-09-22T09:42:01.806507Z	latency_ms=1.72;model_version=2;path=/health;request_id=4dad378a-6337-43cc-9fdb-4fb04241f655;status=200	
+2026-09-22T09:42:01.784990Z		
+2026-09-22T09:38:43.947504Z		The request was not authenticated. Either allow unauthenticated invocations or set the proper Authorization header. Empty Authorization header value. Read more at https://cloud.google.com/run/docs/securing/authenticating Additional troubleshooting documentation can be found at: https://cloud.google.com/run/docs/troubleshooting#unauthorized-client
+2026-09-22T09:38:35.139332Z		INFO:     169.254.169.126:46676 - "POST /predict HTTP/1.1" 422 Unprocessable Entity
+2026-09-22T09:38:35.139170Z	latency_ms=1.92;model_version=2;path=/predict;request_id=e5aed0c6-eeac-46aa-a378-bd280e1b754f;status=422	
+2026-09-22T09:38:35.132816Z		
+2026-09-22T09:38:31.628998Z		INFO:     169.254.169.126:46666 - "GET /ready HTTP/1.1" 200 OK

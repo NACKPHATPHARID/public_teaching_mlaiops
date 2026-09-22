@@ -1,0 +1,160 @@
+{
+    "metrics": {
+        "predict_failures": {
+            "passes": 0,
+            "fails": 3604,
+            "thresholds": {
+                "rate<0.01": false
+            },
+            "value": 0
+        },
+        "http_req_duration": {
+            "p(95)": 1001.1752452999999,
+            "p(99)": 1121.3457281699996,
+            "max": 1635.67114,
+            "avg": 430.84830094755887,
+            "min": 65.842744,
+            "med": 329.7092765
+        },
+        "http_reqs": {
+            "count": 3604,
+            "rate": 113.05746520775911
+        },
+        "checks": {
+            "passes": 10812,
+            "fails": 0,
+            "value": 1
+        },
+        "iterations": {
+            "count": 3604,
+            "rate": 113.05746520775911
+        },
+        "http_req_sending": {
+            "max": 12.434972,
+            "avg": 0.11242739844617111,
+            "min": 0.042894,
+            "med": 0.101254,
+            "p(95)": 0.17818874999999998,
+            "p(99)": 0.25271797999999907
+        },
+        "vus": {
+            "max": 50,
+            "value": 3,
+            "min": 3
+        },
+        "http_req_connecting": {
+            "p(99)": 34.79150672999994,
+            "max": 157.200138,
+            "avg": 0.6882064858490566,
+            "min": 0,
+            "med": 0,
+            "p(95)": 0
+        },
+        "data_sent": {
+            "count": 950181,
+            "rate": 29807.174070081506
+        },
+        "http_req_waiting": {
+            "avg": 430.5749705826866,
+            "min": 65.460617,
+            "med": 329.4417745,
+            "p(95)": 1000.8467033999999,
+            "p(99)": 1121.1369346899996,
+            "max": 1635.501593
+        },
+        "predict_latency_ms": {
+            "p(95)": 1001.1752452999999,
+            "p(99)": 1121.3457281699996,
+            "max": 1635.67114,
+            "avg": 430.84830094755887,
+            "min": 65.842744,
+            "med": 329.7092765,
+            "thresholds": {
+                "p(95)<250": true
+            }
+        },
+        "http_req_blocked": {
+            "p(99)": 144.0956235699998,
+            "max": 246.295111,
+            "avg": 2.331453463929475,
+            "min": 0.000194,
+            "med": 0.000292,
+            "p(95)": 0.000486
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 3604,
+            "value": 0
+        },
+        "data_received": {
+            "count": 1292373,
+            "rate": 40541.73570559025
+        },
+        "http_req_duration{expected_response:true}": {
+            "min": 65.842744,
+            "med": 329.7092765,
+            "p(95)": 1001.1752452999999,
+            "p(99)": 1121.3457281699996,
+            "max": 1635.67114,
+            "avg": 430.84830094755887
+        },
+        "http_req_tls_handshaking": {
+            "avg": 1.2298970998890122,
+            "min": 0,
+            "med": 0,
+            "p(95)": 0,
+            "p(99)": 70.72871004999979,
+            "max": 138.38121
+        },
+        "iteration_duration": {
+            "avg": 421.7980093928969,
+            "min": 65.988145,
+            "med": 324.0030595,
+            "p(95)": 986.29204855,
+            "p(99)": 1057.0745221299997,
+            "max": 1156.959732
+        },
+        "vus_max": {
+            "value": 50,
+            "min": 50,
+            "max": 50
+        },
+        "http_req_receiving": {
+            "avg": 0.16090296642619314,
+            "min": 0.022954,
+            "med": 0.11545,
+            "p(95)": 0.4652632499999998,
+            "p(99)": 0.7954313999999977,
+            "max": 4.430785
+        }
+    },
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "status is 200": {
+                    "passes": 3604,
+                    "fails": 0,
+                    "name": "status is 200",
+                    "path": "::status is 200",
+                    "id": "6210a8cd14cd70477eba5c5e4cb3fb5f"
+                },
+                "probability present": {
+                    "name": "probability present",
+                    "path": "::probability present",
+                    "id": "094bdf8b907d13f6c29f89d21d4c5694",
+                    "passes": 3604,
+                    "fails": 0
+                },
+                "version reported": {
+                    "fails": 0,
+                    "name": "version reported",
+                    "path": "::version reported",
+                    "id": "434d64ee853698f49199ff86c02cce31",
+                    "passes": 3604
+                }
+            }
+    }
+}

@@ -1,0 +1,43 @@
+
+
+  █ THRESHOLDS 
+
+    predict_failures
+    ✓ 'rate<0.01' rate=0.00%
+
+    predict_latency_ms
+    ✓ 'p(95)<250' p(95)=95.708073
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 16458   544.805971/s
+    checks_succeeded...: 100.00% 16458 out of 16458
+    checks_failed......: 0.00%   0 out of 16458
+
+    ✓ status is 200
+    ✓ probability present
+    ✓ version reported
+
+    CUSTOM
+    predict_failures...............: 0.00%  0 out of 5486
+    predict_latency_ms.............: avg=65.556243 min=45.115282 med=61.005871 p(95)=95.708073 p(99)=122.040112 max=268.834912
+
+    HTTP
+    http_req_duration..............: avg=65.55ms   min=45.11ms   med=61ms      p(95)=95.7ms    p(99)=122.04ms   max=268.83ms  
+      { expected_response:true }...: avg=65.55ms   min=45.11ms   med=61ms      p(95)=95.7ms    p(99)=122.04ms   max=268.83ms  
+    http_req_failed................: 0.00%  0 out of 5486
+    http_reqs......................: 5486   181.60199/s
+
+    EXECUTION
+    iteration_duration.............: avg=65.7ms    min=45.42ms   med=61.16ms   p(95)=95.13ms   p(99)=117.12ms   max=304.57ms  
+    iterations.....................: 5486   181.60199/s
+    vus............................: 12     min=12        max=12
+    vus_max........................: 12     min=12        max=12
+
+    NETWORK
+    data_received..................: 1.4 MB 48 kB/s
+    data_sent......................: 1.3 MB 43 kB/s
+
+
+
