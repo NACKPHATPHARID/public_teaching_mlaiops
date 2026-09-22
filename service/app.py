@@ -37,6 +37,22 @@ def _load_model():
     """
     name = os.environ.get("MODEL_REGISTRY_NAME")
     version = os.environ.get("MODEL_VERSION")
+    uri = os.environ.get("MODEL_ARTIFACT_URI")
+    if uri and os.environ.get("CLOUD_PROVIDER", "local") != "local":
+        # Deployed: deploy() resolved MODEL_VERSION in the registry to this artifact
+        # (same pattern as Vertex's AIP_STORAGE_URI). Fetched once, through the seam.
+        import tempfile
+        from pathlib import Path
+
+        import joblib
+
+        from cloudlayer.factory import get_adapter
+        from src import config
+
+        local = Path(tempfile.gettempdir()) / "model.joblib"
+        get_adapter(config.load(strict=False)).download(uri, str(local))
+        return joblib.load(local)
+
     if name and version:
         import mlflow.sklearn  # imported lazily so tests can run without a registry
 
