@@ -49,7 +49,7 @@ def _load_model():
         from cloudlayer.factory import get_adapter
         from src import config
 
-        local = Path(tempfile.gettempdir()) / "model.joblib"
+        local = Path(tempfile.gettempdir()) / f"model-{os.getpid()}.joblib"  # one file per worker: no race
         get_adapter(config.load(strict=False)).download(uri, str(local))
         return joblib.load(local)
 
