@@ -20,7 +20,9 @@ from sklearn.ensemble import RandomForestClassifier
 from src import config, data, seeds
 
 RAW = config.REPO_ROOT / "data" / "raw" / "sensors.csv"
-LATENCY_BUDGET_MS = 50.0  # TODO(Lab 4): set from YOUR p95 target in loadtest/k6.js
+# About 6x the 7.9 ms measured for one prediction at n_jobs=1 in Lab 3, so a slow CI runner
+# does not flake, and 20% of the 250 ms p95 target in loadtest/k6.js.
+LATENCY_BUDGET_MS = 50.0
 
 
 @pytest.fixture(scope="module")
@@ -76,6 +78,7 @@ def test_risk_increases_with_wear(fitted):
 def test_prediction_latency_within_budget(fitted):
     model, test_df = fitted
     sample = test_df[data.FEATURES].head(100)
+    model.set_params(n_jobs=1)  # serving runs n_jobs=1 (Lab 3); n_jobs=-1 adds thread setup per call
     model.predict_proba(sample)  # warm up; the first call includes lazy setup
     started = time.perf_counter()
     for _ in range(20):
