@@ -1,8 +1,7 @@
-# ITCS355 Lab 4 — continuous deployment.
+# ITCS355 Lab 4: continuous deployment to staging.
 #
-# Runs only on main, only after CI is green. Credentials come from OIDC federation, not
-# from stored keys — TODO(Lab 4): uncomment the block for YOUR provider and delete the
-# other two.
+# Runs only on main, only after CI is green, on the exact commit CI tested.
+# Credentials come from OIDC federation (workload identity), no stored keys.
 
 name: CD
 
@@ -16,47 +15,95 @@ permissions:
   contents: read
   id-token: write
 
+concurrency:
+  group: cd-staging
+  cancel-in-progress: false
+
+env:
+  CLOUD_PROVIDER: gcp
+  PROJECT_ID: ${{ vars.PROJECT_ID }}
+  REGION: ${{ vars.REGION }}
+  BLOB_URI: ${{ vars.BLOB_URI }}
+  CONTAINER_REGISTRY: ${{ vars.CONTAINER_REGISTRY }}
+  MLFLOW_TRACKING_URI: sqlite:///mlflow.db
+  MODEL_REGISTRY_NAME: ${{ vars.MODEL_REGISTRY_NAME }}
+  IDENTITY_REF: ${{ vars.IDENTITY_REF }}
+  IMAGE_TAG: ${{ github.event.workflow_run.head_sha }}
+  STAGING_MODEL_VERSION: ${{ vars.STAGING_MODEL_VERSION }}
+  STAGING_ENDPOINT: itcs355-serve-staging
+
 jobs:
   deploy-staging:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     environment: staging
     steps:
+      # Check out the commit CI tested, not whatever main is now.
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
 
-      # --- AWS ---------------------------------------------------------------
-      # - uses: aws-actions/configure-aws-credentials@v4
-      #   with:
-      #     role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
-      #     aws-region: ${{ vars.REGION }}
-      # - run: aws ecr get-login-password --region ${{ vars.REGION }} | docker login --username AWS --password-stdin ${{ vars.CONTAINER_REGISTRY }}
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_DEPLOY_SA }}
 
-      # --- Azure -------------------------------------------------------------
-      # - uses: azure/login@v2
-      #   with:
-      #     client-id: ${{ secrets.AZURE_CLIENT_ID }}
-      #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-      #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      # - run: az acr login --name ${{ vars.ACR_NAME }}
+      - uses: google-github-actions/setup-gcloud@v2
 
-      # --- GCP ---------------------------------------------------------------
-      # - uses: google-github-actions/auth@v2
-      #   with:
-      #     workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
-      #     service_account: ${{ secrets.GCP_DEPLOY_SA }}
-      # - run: gcloud auth configure-docker ${{ vars.REGION }}-docker.pkg.dev
+      - name: Docker auth for Artifact Registry
+        run: gcloud auth configure-docker ${{ vars.REGION }}-docker.pkg.dev --quiet
 
-      - name: Push image
-        run: |
-          echo "TODO(Lab 4): push the SHA-tagged image through your adapter"
-          # python -c "from src import config; from cloudlayer.factory import get_adapter; \
-          #   print(get_adapter(config.load()).push_image('itcs355-serve:${{ github.sha }}'))"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: pip install -r requirements.txt
+
+      - name: Build serving image
+        run: docker build --platform linux/amd64 -f service/Dockerfile.serve -t itcs355-serve:${IMAGE_TAG} .
 
       - name: Deploy to staging
+        env:
+          SERVE_IMAGE: itcs355-serve:${{ github.event.workflow_run.head_sha }}
+          SERVE_MIN_INSTANCES: "0"
         run: |
-          echo "TODO(Lab 4): adapter.deploy(model_ref, endpoint, instance)"
+          python - <<'PY'
+          import os
+          from src import config
+          from cloudlayer.factory import get_adapter
+          a = get_adapter(config.load())
+          v, ep = os.environ["STAGING_MODEL_VERSION"], os.environ["STAGING_ENDPOINT"]
+          # deploy() pushes the SHA-tagged image and returns a digest-pinned reference.
+          print("deployed", a.deploy(v, ep, "1/1Gi"))
+          # An existing service gets the new revision with 0% traffic. Move staging onto it.
+          print(a.set_traffic(ep, {f"model-v{v}": 100}))
+          PY
 
       - name: Smoke test
         run: |
-          echo "TODO(Lab 4): adapter.invoke() with three known payloads."
-          echo "A deploy that is not smoke-tested is a deploy you have not verified."
+          python - <<'PY'
+          import os
+          from src import config
+          from cloudlayer.factory import get_adapter
+          a = get_adapter(config.load())
+          ep, v = os.environ["STAGING_ENDPOINT"], os.environ["STAGING_MODEL_VERSION"]
+          payloads = {
+              "healthy": {"temp_c": 66.0, "vibration_mm_s": 1.4, "pressure_kpa": 330.0,
+                          "hours_since_service": 50.0, "load_pct": 30.0, "ambient_humidity": 50.0},
+              "typical": {"temp_c": 78.4, "vibration_mm_s": 3.1, "pressure_kpa": 315.2,
+                          "hours_since_service": 4200.0, "load_pct": 68.0, "ambient_humidity": 55.0},
+              "worn": {"temp_c": 82.0, "vibration_mm_s": 4.0, "pressure_kpa": 310.0,
+                       "hours_since_service": 8500.0, "load_pct": 75.0, "ambient_humidity": 60.0},
+          }
+          out = {}
+          for name, p in payloads.items():
+              r = a.invoke(ep, p)
+              assert 0.0 <= r["probability"] <= 1.0, (name, r)
+              assert str(r["model_version"]) == v, (name, r)
+              out[name] = r["probability"]
+              print(name, r)
+          assert out["healthy"] < 0.5, f"healthy machine flagged: {out}"
+          assert out["healthy"] <= out["worn"], f"risk fell with wear: {out}"
+          PY

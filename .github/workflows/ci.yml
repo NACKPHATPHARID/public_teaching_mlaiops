@@ -19,6 +19,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history. A depth-1 checkout makes the scan pass on a repo full of keys.
+
+      - name: Secret scan (full history)
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest detect --source /repo --redact --verbose
 
       - uses: actions/setup-python@v5
         with:

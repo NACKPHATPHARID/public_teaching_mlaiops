@@ -148,3 +148,27 @@ though the dev machine is already amd64.
 
 That last check is not optional. A credential in Git history is an automatic deduction in this
 course, and rotating it is your responsibility, not the grader's.
+
+## Lab 4: what each data contract test guards against
+
+Schema test: a vendor firmware update renames or drops a sensor column, or an export
+writes "N/A" so a numeric column turns into text. Without this the model scores on
+missing or garbage inputs and nothing errors.
+
+Null test: a gateway outage leaves temp_c blank for a whole shift.
+
+Range test: one production line starts reporting Fahrenheit, so 78 C arrives as 172.
+The ceiling is 140, so this fails the build instead of flooding the alert queue.
+
+Target test: a broken label join makes every row 0 and a retrain learns to never flag
+anything.
+
+Unique ID test: a replayed batch loads the same readings twice, which inflates the
+data and can put one machine's rows on both sides of a split.
+
+Leakage test: someone switches to a row-level random split, validation AUC jumps, and
+the score falls apart on machines the model has never seen.
+
+Latency budget: 50 ms for one prediction in the test. Lab 3 measured 7.9 ms at
+n_jobs=1, so this is about 6x headroom for a slow CI runner, and 20% of the 250 ms p95
+target in loadtest/k6.js. The test sets n_jobs=1 because serving does.
