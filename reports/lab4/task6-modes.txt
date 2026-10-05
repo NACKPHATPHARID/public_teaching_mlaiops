@@ -1,0 +1,35 @@
+== shift 2
+  mean 79.5800 -> 81.5800
+feature                      psi        ks  verdict
+temp_c                   0.04208   0.08767  stable
+vibration_mm_s           0.00000   0.00000  stable
+pressure_kpa             0.00000   0.00000  stable
+hours_since_service      0.00000   0.00000  stable
+== shift 6
+  mean 79.5800 -> 85.5800
+feature                      psi        ks  verdict
+temp_c                   0.38333   0.24567  significant
+vibration_mm_s           0.00000   0.00000  stable
+pressure_kpa             0.00000   0.00000  stable
+hours_since_service      0.00000   0.00000  stable
+== scale 1.5
+  mean 79.5800 -> 79.5800
+feature                      psi        ks  verdict
+temp_c                   0.20583   0.11383  moderate
+vibration_mm_s           0.00000   0.00000  stable
+pressure_kpa             0.00000   0.00000  stable
+hours_since_service      0.00000   0.00000  stable
+== scale 2
+  mean 79.5800 -> 79.5800
+feature                      psi        ks  verdict
+temp_c                   0.51663   0.18783  significant
+vibration_mm_s           0.00000   0.00000  stable
+pressure_kpa             0.00000   0.00000  stable
+hours_since_service      0.00000   0.00000  stable
+== mix 1
+  mean 79.5800 -> 80.1723
+feature                      psi        ks  verdict
+temp_c                   0.00873   0.03417  stable
+load_pct                 0.00852   0.02400  stable
+vibration_mm_s           0.00378   0.03000  stable
+pressure_kpa             0.00366   0.01267  stable

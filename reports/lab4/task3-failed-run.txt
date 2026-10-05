@@ -1,0 +1,38 @@
+test	Data contract tests	﻿2026-10-05T14:34:57.4925069Z ##[group]Run pytest -q tests/test_data.py
+test	Data contract tests	2026-10-05T14:34:57.4925697Z [36;1mpytest -q tests/test_data.py[0m
+test	Data contract tests	2026-10-05T14:34:57.4993231Z shell: /usr/bin/bash -e {0}
+test	Data contract tests	2026-10-05T14:34:57.4993495Z env:
+test	Data contract tests	2026-10-05T14:34:57.4993771Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.16/x64
+test	Data contract tests	2026-10-05T14:34:57.4994219Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib/pkgconfig
+test	Data contract tests	2026-10-05T14:34:57.4994678Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+test	Data contract tests	2026-10-05T14:34:57.4995075Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+test	Data contract tests	2026-10-05T14:34:57.4995477Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.16/x64
+test	Data contract tests	2026-10-05T14:34:57.4995867Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.16/x64/lib
+test	Data contract tests	2026-10-05T14:34:57.4996197Z ##[endgroup]
+test	Data contract tests	2026-10-05T14:34:58.3875870Z ..F.......                                                               [100%]
+test	Data contract tests	2026-10-05T14:34:58.3876785Z =================================== FAILURES ===================================
+test	Data contract tests	2026-10-05T14:34:58.3877810Z ____________________ test_features_within_plausible_ranges _____________________
+test	Data contract tests	2026-10-05T14:34:58.3878477Z 
+test	Data contract tests	2026-10-05T14:34:58.3878830Z df =       reading_id  machine_id  ...  ambient_humidity  failed_within_7d
+test	Data contract tests	2026-10-05T14:34:58.3880002Z 0              0           0  ...            63....65.351                 1
+test	Data contract tests	2026-10-05T14:34:58.3880749Z 5999        5999         239  ...            55.347                 1
+test	Data contract tests	2026-10-05T14:34:58.3881230Z 
+test	Data contract tests	2026-10-05T14:34:58.3881416Z [6000 rows x 9 columns]
+test	Data contract tests	2026-10-05T14:34:58.3881749Z 
+test	Data contract tests	2026-10-05T14:34:58.3882033Z     def test_features_within_plausible_ranges(df):
+test	Data contract tests	2026-10-05T14:34:58.3882718Z         for col, (lo, hi) in data.PLAUSIBLE_RANGES.items():
+test	Data contract tests	2026-10-05T14:34:58.3883457Z             assert df[col].min() >= lo, f"{col} below plausible floor: {df[col].min()}"
+test	Data contract tests	2026-10-05T14:34:58.3884323Z >           assert df[col].max() <= hi, f"{col} above plausible ceiling: {df[col].max()}"
+test	Data contract tests	2026-10-05T14:34:58.3885123Z E           AssertionError: temp_c above plausible ceiling: 240.215
+test	Data contract tests	2026-10-05T14:34:58.3885696Z E           assert np.float64(240.215) <= 140.0
+test	Data contract tests	2026-10-05T14:34:58.3886037Z E            +  where np.float64(240.215) = max()
+test	Data contract tests	2026-10-05T14:34:58.3886932Z E            +    where max = 0       180.460\n1       209.053\n2       202.125\n3       187.472\n4       193.931\n         ...   \n5995    224.254\n5996    231.332\n5997    204.637\n5998    220.783\n5999    231.396\nName: temp_c, Length: 6000, dtype: float64.max
+test	Data contract tests	2026-10-05T14:34:58.3887740Z 
+test	Data contract tests	2026-10-05T14:34:58.3887870Z tests/test_data.py:51: AssertionError
+test	Data contract tests	2026-10-05T14:34:58.3888239Z =========================== short test summary info ============================
+test	Data contract tests	2026-10-05T14:34:58.3889007Z FAILED tests/test_data.py::test_features_within_plausible_ranges - AssertionError: temp_c above plausible ceiling: 240.215
+test	Data contract tests	2026-10-05T14:34:58.3889886Z assert np.float64(240.215) <= 140.0
+test	Data contract tests	2026-10-05T14:34:58.3890206Z  +  where np.float64(240.215) = max()
+test	Data contract tests	2026-10-05T14:34:58.3891321Z  +    where max = 0       180.460\n1       209.053\n2       202.125\n3       187.472\n4       193.931\n         ...   \n5995    224.254\n5996    231.332\n5997    204.637\n5998    220.783\n5999    231.396\nName: temp_c, Length: 6000, dtype: float64.max
+test	Data contract tests	2026-10-05T14:34:58.3892381Z 1 failed, 9 passed in 0.47s
+test	Data contract tests	2026-10-05T14:34:58.4914703Z ##[error]Process completed with exit code 1.

@@ -1,0 +1,10 @@
+INJECTION START 2026-10-05T17:01:14Z
+python scripts/inject_drift.py --feature temp_c --mode shift --magnitude 6
+wrote data/current.csv  mode=shift  feature=temp_c
+  mean 79.5800 -> 85.5800
+
+Now run: python -m monitoring.drift --current data/current.csv
+Record the time from injection to alert. That is your detection latency.
+sent 3000, ok 3000, failed 0
+mean temp_c sent 85.57, mean probability 0.1354 (baseline was 0.1191)
+INJECTION END 2026-10-05T17:03:51Z

@@ -1,0 +1,12 @@
+name: predict_by_model_version
+description: Predict requests on staging, labelled by model version
+filter: resource.type="cloud_run_revision" AND resource.labels.service_name="itcs355-serve-staging" AND jsonPayload.path="/predict"
+metricDescriptor:
+  metricKind: DELTA
+  valueType: INT64
+  unit: "1"
+  labels:
+  - key: model_version
+    valueType: STRING
+labelExtractors:
+  model_version: EXTRACT(jsonPayload.model_version)
