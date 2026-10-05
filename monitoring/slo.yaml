@@ -1,32 +1,40 @@
-# Lab 4 — service level objectives.
-#
-# Most students write a target and stop. The third field is where the thinking is: an SLO
-# without a stated response to exhaustion is a wish, not an objective.
+# Lab 4: service level objectives.
 
 service: itcs355-predict
 
 objectives:
+  # 99.5% over 30 days allows about 3.6 hours of 5xx responses. This is one region, it
+  # scales to zero, and a cold start took about 16 s in Lab 3. A target like 99.9% (43
+  # minutes a month) would be used up by one bad deploy. 99.5% is tight enough to notice a
+  # failed rollout and loose enough to meet without a pager.
   - name: availability
-    target: 0.995              # TODO(Lab 4): your number, and defend it
+    target: 0.995
     window: 30d
     measurement: "successful responses / total responses, excluding 4xx"
     on_budget_exhausted: |
-      TODO(Lab 4): what actually happens. Freeze deploys? Page someone? Fall back to the
-      last known-good version? Accept it and revise the target? All are defensible;
-      silence is not.
+      Freeze every deploy except a fix for the cause. Move traffic back to the last good
+      revision (the model-v2 tag, with set_traffic) first and investigate second. At the
+      end of the window, raise the target only if we met it with room to spare.
 
+  # Same number as loadtest/k6.js, which I set before measuring in Lab 3. Warm, the tuned
+  # service did 86 ms p95 at 10 users, so 250 ms leaves room for the network and for load.
   - name: latency
-    target_p95_ms: 200         # TODO(Lab 4): must match the target you set in loadtest/k6.js
+    target_p95_ms: 250
     window: 7d
     measurement: "p95 of /predict, measured at the endpoint, not at the client"
     on_budget_exhausted: |
-      TODO(Lab 4)
+      Find out whether it was queueing or cold starts, as in Lab 3. For queueing, add
+      instances or lower per-instance concurrency. For cold starts, set min instances to 1,
+      which costs about 18 dollars a month at idle rates. No new model ships until p95 is
+      back under target.
 
+  # The weekly schedule in pipeline/pipeline.yaml (Sundays 02:00) keeps the model under 7
+  # days old, so this only bites when that schedule has stopped working.
   - name: freshness
     target_max_model_age_days: 30
     window: continuous
     measurement: "days since the production model version was trained"
     on_budget_exhausted: |
-      TODO(Lab 4): this one interacts with your retraining trigger in Lab 5. Keep them
-      consistent — an SLO demanding a 30-day-old model and a 90-day retrain schedule is
-      a contradiction you should notice here rather than in production.
+      Run the training pipeline, but check the drift alert and the null rate first. An old
+      model is a smaller problem than a model retrained on corrupted data, so if the feed
+      is broken, fix the producer before retraining.

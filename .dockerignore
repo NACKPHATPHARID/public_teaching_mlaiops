@@ -16,3 +16,6 @@ instructor/
 # even though the excluded data/ directory itself must not be baked in.
 !data/raw.dvc
 !.dvc/config
+
+# Lab 4 drift job: the reference window is baked into monitoring/Dockerfile.drift
+!data/raw/sensors.csv
