@@ -8,6 +8,7 @@ Run locally:  uvicorn service.app:app --port 8080
 """
 from __future__ import annotations
 
+import json
 import logging
 import os
 import time
@@ -145,7 +146,11 @@ def _score(rows: list[dict]) -> list[float]:
 
 @app.post("/predict", response_model=PredictResponse)
 def predict(payload: PredictRequest) -> PredictResponse:
-    score = _score([payload.model_dump()])[0]
+    row = payload.model_dump()
+    score = _score([row])[0]
+    # One structured line per prediction. The drift job reads these back from the logs;
+    # Cloud Run turns a JSON line on stdout into jsonPayload, so it can be filtered.
+    print(json.dumps({"event": "features", "model_version": str(STATE["version"]), **row}), flush=True)
     return PredictResponse(probability=score, model_version=str(STATE["version"]))
 
 
