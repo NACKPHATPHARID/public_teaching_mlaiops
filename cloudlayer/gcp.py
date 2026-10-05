@@ -431,3 +431,31 @@ class GcpAdapter(CloudAdapter):
         self._run("services", "update-traffic", endpoint, "--to-tags",
                   ",".join(f"{t}={p}" for t, p in split.items()), "--quiet")
         return self._run("services", "describe", endpoint, "--format=yaml(status.traffic)")
+    # =============================================================================================
+    # Lab 4: metrics (Cloud Monitoring)
+    # =============================================================================================
+    def emit_metric(self, name: str, value: float, unit: str = "None") -> None:
+        """Write one point to a custom metric. The metric is created on first write.
+        `unit` is accepted for the interface; the write API doesn't take a unit."""
+        import urllib.error
+        import urllib.request
+        from datetime import datetime, timezone
+
+        metric = re.sub(r"[^A-Za-z0-9_./-]", "_", name)
+        end = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        body = {"timeSeries": [{
+            "metric": {"type": f"custom.googleapis.com/mlaiops/{metric}"},
+            "resource": {"type": "global", "labels": {"project_id": self.cfg.project_id}},
+            "points": [{"interval": {"endTime": end}, "value": {"doubleValue": float(value)}}],
+        }]}
+        req = urllib.request.Request(
+            f"https://monitoring.googleapis.com/v3/projects/{self.cfg.project_id}/timeSeries",
+            method="POST", data=json.dumps(body).encode(),
+            headers={"Authorization": f"Bearer {self._access_token()}",
+                     "Content-Type": "application/json"},
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                resp.read()
+        except urllib.error.HTTPError as e:
+            raise RuntimeError(f"emit_metric({name}) failed: {e.code} {e.read().decode()}") from e
