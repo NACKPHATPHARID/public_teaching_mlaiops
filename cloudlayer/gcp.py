@@ -431,31 +431,55 @@ class GcpAdapter(CloudAdapter):
         self._run("services", "update-traffic", endpoint, "--to-tags",
                   ",".join(f"{t}={p}" for t, p in split.items()), "--quiet")
         return self._run("services", "describe", endpoint, "--format=yaml(status.traffic)")
+
     # =============================================================================================
     # Lab 4: metrics (Cloud Monitoring)
     # =============================================================================================
-    def emit_metric(self, name: str, value: float, unit: str = "None") -> None:
-        """Write one point to a custom metric. The metric is created on first write.
-        `unit` is accepted for the interface; the write API doesn't take a unit."""
-        import urllib.error
+    def _monitoring_post(self, path: str, body: dict) -> None:
         import urllib.request
-        from datetime import datetime, timezone
 
-        metric = re.sub(r"[^A-Za-z0-9_./-]", "_", name)
-        end = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-        body = {"timeSeries": [{
-            "metric": {"type": f"custom.googleapis.com/mlaiops/{metric}"},
-            "resource": {"type": "global", "labels": {"project_id": self.cfg.project_id}},
-            "points": [{"interval": {"endTime": end}, "value": {"doubleValue": float(value)}}],
-        }]}
         req = urllib.request.Request(
-            f"https://monitoring.googleapis.com/v3/projects/{self.cfg.project_id}/timeSeries",
+            f"https://monitoring.googleapis.com/v3/projects/{self.cfg.project_id}/{path}",
             method="POST", data=json.dumps(body).encode(),
             headers={"Authorization": f"Bearer {self._access_token()}",
                      "Content-Type": "application/json"},
         )
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            resp.read()
+
+    def emit_metric(self, name: str, value: float, unit: str = "None") -> None:
+        """Write one point to a custom metric.
+        Cloud Monitoring's auto-create on first write returns HTTP 500 for new names, so the
+        descriptor is created explicitly first (409 = already exists, which is fine).
+        `unit` is accepted for the interface; the write API doesn't take a unit."""
+        import urllib.error
+        from datetime import datetime, timezone
+
+        metric = re.sub(r"[^A-Za-z0-9_./-]", "_", name)
+        mtype = f"custom.googleapis.com/mlaiops/{metric}"
+        known = self.__dict__.setdefault("_known_metrics", set())
         try:
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                resp.read()
+            if metric not in known:
+                try:
+                    self._monitoring_post("metricDescriptors", {
+                        "type": mtype, "metricKind": "GAUGE", "valueType": "DOUBLE"})
+                except urllib.error.HTTPError as e:
+                    if e.code != 409:
+                        raise
+                known.add(metric)
+            end = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            body = {"timeSeries": [{
+                "metric": {"type": mtype},
+                "resource": {"type": "global", "labels": {"project_id": self.cfg.project_id}},
+                "points": [{"interval": {"endTime": end}, "value": {"doubleValue": float(value)}}],
+            }]}
+            for attempt in range(3):
+                try:
+                    self._monitoring_post("timeSeries", body)
+                    return
+                except urllib.error.HTTPError as e:
+                    if e.code < 500 or attempt == 2:
+                        raise
+                    time.sleep(2)
         except urllib.error.HTTPError as e:
             raise RuntimeError(f"emit_metric({name}) failed: {e.code} {e.read().decode()}") from e
