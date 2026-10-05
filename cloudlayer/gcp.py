@@ -417,8 +417,10 @@ class GcpAdapter(CloudAdapter):
     def invoke(self, endpoint: str, payload: dict[str, Any]) -> dict[str, Any]:
         import urllib.request
         url = endpoint if endpoint.startswith("https://") else self._service_url(endpoint)
-        token = subprocess.run(["gcloud", "auth", "print-identity-token"],
-                               capture_output=True, text=True, check=True).stdout.strip()
+        import os
+        token = os.environ.get("SERVE_ID_TOKEN") or subprocess.run(
+            ["gcloud", "auth", "print-identity-token"],
+            capture_output=True, text=True, check=True).stdout.strip()
         req = urllib.request.Request(
             url.rstrip("/") + "/predict", method="POST", data=json.dumps(payload).encode(),
             headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},

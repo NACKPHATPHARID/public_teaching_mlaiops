@@ -81,7 +81,23 @@ jobs:
           print(a.set_traffic(ep, {f"model-v{v}": 100}))
           PY
 
+      - name: Staging URL
+        id: url
+        run: echo "value=$(gcloud run services describe ${STAGING_ENDPOINT} --region ${REGION} --format='value(status.url)')" >> "$GITHUB_OUTPUT"
+
+      - name: ID token for the staging service
+        id: idtoken
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_DEPLOY_SA }}
+          token_format: id_token
+          id_token_audience: ${{ steps.url.outputs.value }}
+          id_token_include_email: true
+
       - name: Smoke test
+        env:
+          SERVE_ID_TOKEN: ${{ steps.idtoken.outputs.id_token }}
         run: |
           python - <<'PY'
           import os
