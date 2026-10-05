@@ -172,3 +172,16 @@ the score falls apart on machines the model has never seen.
 Latency budget: 50 ms for one prediction in the test. Lab 3 measured 7.9 ms at
 n_jobs=1, so this is about 6x headroom for a slow CI runner, and 20% of the 250 ms p95
 target in loadtest/k6.js. The test sets n_jobs=1 because serving does.
+
+## Lab 4: blocked bad commit
+
+I opened a pull request that makes make_dataset.py write temp_c in Fahrenheit, the
+"one line switches units" incident. CI failed at the Data contract tests step with
+test_features_within_plausible_ranges: "temp_c above plausible ceiling: 240.215" (limit
+140). Model behaviour tests, service tests and the image build did not run, so nothing
+shipped. The pull request was closed without merging.
+
+Run: https://github.com/NACKPHATPHARID/public_teaching_mlaiops/actions/runs/37325707384
+
+The schema test passed on this change, since the column and its type were still correct.
+Only the range test caught it, which is why both exist.
