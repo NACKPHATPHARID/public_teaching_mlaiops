@@ -195,3 +195,7 @@ Only the range test caught it, which is why both exist.
 **SLO** (`monitoring/slo.yaml`). Availability 99.5% over 30 days, which leaves about 3.6 hours of failures a month. That is tight enough that an outage is felt and loose enough that one bad deploy plus a rollback fits inside the budget. When the budget is spent: freeze deploys, roll back to the model-v2 tag, then investigate. Latency p95 under 250 ms over 7 days, the same target as `loadtest/k6.js`. Freshness 30 days.
 
 **Evidence** is in `reports/lab4/`: the blocked bad commit (`task3-failed-run.txt`, test_features_within_plausible_ranges, temp_c above its ceiling), the staging smoke test, the injection timeline and the drift job logs before and after, and the injection modes comparison. Dashboard and alert are committed as code in `infra/gcp/`.
+
+### Which statistic caught which fault
+
+I ran all the injection modes (`reports/lab4/task6-modes.txt`). A mean shift of +2 gave PSI 0.042 and KS 0.088, under my temp_c limit of 0.14, so it would not alert. A shift of +6 gave PSI 0.383 and KS 0.246, which did fire. Scaling by 1.5 leaves the mean at 79.58, yet PSI reached 0.206 while KS was only 0.114, so PSI is better at catching a change in spread. The mix mode, the most realistic one, gave PSI 0.009 and KS 0.034 and stayed stable, so a slow change in the mix of machines would slip past this detector. To catch it I would need a longer window or a check on prediction quality, not only input drift.
