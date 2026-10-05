@@ -185,3 +185,13 @@ Run: https://github.com/NACKPHATPHARID/public_teaching_mlaiops/actions/runs/3732
 
 The schema test passed on this change, since the column and its type were still correct.
 Only the range test caught it, which is why both exist.
+
+## Lab 4: drift threshold, SLO, and evidence
+
+**Drift threshold.** Each feature has its own PSI limit, set in `monitoring/drift_job.py` from `monitoring/calibrate.py`. That script scores 300 clean windows of 3000 rows (whole machines at a time, since that is how real traffic arrives) and the limit is 1.5 times the clean p99, with a floor of 0.10. The limits are 0.10 for ambient_humidity, hours_since_service, pressure_kpa and vibration_mm_s, 0.14 for temp_c and 0.25 for load_pct. I did not use the common 0.25 for everything, because on clean data load_pct alone goes above 0.25 in about one window in a hundred at 1000 rows. A window needs at least 300 rows or the job does not judge. On clean staging traffic the highest PSI was 0.008. With temp_c shifted by 6 it was 0.393.
+
+**Alerting.** Cloud Scheduler runs the drift job every 15 minutes. The job writes `drift.breached_features`, and one alert policy emails me when it is above 0. Detection time in the injection exercise was 16 min 52 s from injection start to incident (14 min 16 s to the job, 2 min 36 s through the alert). Post-mortem: `reports/lab4-postmortem.md`.
+
+**SLO** (`monitoring/slo.yaml`). Availability 99.5% over 30 days, which leaves about 3.6 hours of failures a month. That is tight enough that an outage is felt and loose enough that one bad deploy plus a rollback fits inside the budget. When the budget is spent: freeze deploys, roll back to the model-v2 tag, then investigate. Latency p95 under 250 ms over 7 days, the same target as `loadtest/k6.js`. Freshness 30 days.
+
+**Evidence** is in `reports/lab4/`: the blocked bad commit (`task3-failed-run.txt`, test_features_within_plausible_ranges, temp_c above its ceiling), the staging smoke test, the injection timeline and the drift job logs before and after, and the injection modes comparison. Dashboard and alert are committed as code in `infra/gcp/`.

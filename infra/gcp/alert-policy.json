@@ -1,0 +1,21 @@
+{
+  "displayName": "ITCS355 feature drift",
+  "combiner": "OR",
+  "conditions": [{
+    "displayName": "drift.breached_features above 0",
+    "conditionThreshold": {
+      "filter": "metric.type=\"custom.googleapis.com/mlaiops/drift.breached_features\" AND resource.type=\"global\"",
+      "comparison": "COMPARISON_GT",
+      "thresholdValue": 0,
+      "duration": "0s",
+      "aggregations": [{"alignmentPeriod": "300s", "perSeriesAligner": "ALIGN_MAX"}],
+      "trigger": {"count": 1}
+    }
+  }],
+  "notificationChannels": ["CHANNEL_PLACEHOLDER"],
+  "alertStrategy": {"autoClose": "1800s"},
+  "documentation": {
+    "mimeType": "text/markdown",
+    "content": "One or more features are past their drift limit. Check the schema and null rate FIRST. If the producer broke, do not retrain: fix the producer. Only retrain if the shift is real and persistent. See the drift job output for which features."
+  }
+}

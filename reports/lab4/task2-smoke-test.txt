@@ -1,0 +1,3 @@
+deploy-staging	Smoke test	2026-10-05T15:17:38.0149080Z healthy {'probability': 0.012960175957219024, 'model_version': '2'}
+deploy-staging	Smoke test	2026-10-05T15:17:38.0149879Z typical {'probability': 0.026792116476468123, 'model_version': '2'}
+deploy-staging	Smoke test	2026-10-05T15:17:38.0150567Z worn {'probability': 0.1547457140085066, 'model_version': '2'}

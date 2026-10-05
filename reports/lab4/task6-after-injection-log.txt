@@ -1,0 +1,12 @@
+2026-10-05T17:15:23.354256Z	rows in window: 3000 (need 300)
+2026-10-05T17:15:23.354287Z	feature                     psi       ks    limit
+2026-10-05T17:15:23.358687Z	temp_c                   0.3929   0.2460     0.14
+2026-10-05T17:15:24.453605Z	vibration_mm_s           0.0014   0.0115     0.10
+2026-10-05T17:15:25.522364Z	pressure_kpa             0.0022   0.0155     0.10
+2026-10-05T17:15:26.692526Z	hours_since_service      0.0011   0.0117     0.10
+2026-10-05T17:15:27.796311Z	load_pct                 0.0009   0.0067     0.25
+2026-10-05T17:15:28.844567Z	ambient_humidity         0.0008   0.0080     0.10
+2026-10-05T17:15:30.526130Z	ALERT: temp_c
+2026-10-05T17:15:30.526145Z	Check the schema and the null rate before retraining. If the producer broke, fix it and do not retrain.
+2026-10-05T17:15:30.673370Z	Container called exit(2).
+2026-10-05T17:15:36.306540Z	
