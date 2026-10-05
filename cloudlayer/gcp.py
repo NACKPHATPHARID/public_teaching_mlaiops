@@ -485,3 +485,36 @@ class GcpAdapter(CloudAdapter):
                     time.sleep(2)
         except urllib.error.HTTPError as e:
             raise RuntimeError(f"emit_metric({name}) failed: {e.code} {e.read().decode()}") from e
+
+    def read_logs(self, query: str, since_minutes: int, limit: int = 5000) -> list[dict[str, Any]]:
+        """Recent structured log entries as plain dicts (their jsonPayload), newest first.
+        `query` is a Cloud Logging filter; the time window is added here."""
+        import urllib.request
+        from datetime import datetime, timedelta, timezone
+
+        since = datetime.now(timezone.utc) - timedelta(minutes=since_minutes)
+        stamp = since.strftime("%Y-%m-%dT%H:%M:%SZ")
+        out: list[dict[str, Any]] = []
+        page_token = None
+        while len(out) < limit:
+            body: dict[str, Any] = {
+                "resourceNames": [f"projects/{self.cfg.project_id}"],
+                "filter": f'({query}) AND timestamp>="{stamp}"',
+                "orderBy": "timestamp desc",
+                "pageSize": min(1000, limit - len(out)),
+            }
+            if page_token:
+                body["pageToken"] = page_token
+            req = urllib.request.Request(
+                "https://logging.googleapis.com/v2/entries:list",
+                method="POST", data=json.dumps(body).encode(),
+                headers={"Authorization": f"Bearer {self._access_token()}",
+                         "Content-Type": "application/json"},
+            )
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                data = json.loads(resp.read())
+            out.extend(e["jsonPayload"] for e in data.get("entries", []) if "jsonPayload" in e)
+            page_token = data.get("nextPageToken")
+            if not page_token:
+                break
+        return out
