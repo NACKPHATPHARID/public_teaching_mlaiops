@@ -8,7 +8,6 @@ Thresholds are per feature. See THRESHOLDS below and the Lab 4 section of the RE
 """
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 
@@ -34,33 +33,14 @@ THRESHOLDS = {
 
 
 def recent_features(project: str, service: str, limit: int) -> pd.DataFrame:
-    """Read the feature log lines through the Cloud Logging REST API (no gcloud needed)."""
-    import urllib.request
-
+    """Read the last day of feature log lines the service wrote, through the adapter."""
     from cloudlayer.factory import get_adapter
 
-    token = get_adapter(config.load(strict=False))._access_token()
-    body = {
-        "resourceNames": [f"projects/{project}"],
-        "filter": ('resource.type="cloud_run_revision" '
-                   f'AND resource.labels.service_name="{service}" '
-                   'AND jsonPayload.event="features" '
-                   'AND timestamp>=\"' + (pd.Timestamp.now(tz="UTC") - pd.Timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%SZ") + '\"'),
-        "orderBy": "timestamp desc",
-        "pageSize": min(limit, 1000),
-    }
-    rows: list[dict] = []
-    while len(rows) < limit:
-        req = urllib.request.Request(
-            "https://logging.googleapis.com/v2/entries:list", method="POST",
-            data=json.dumps(body).encode(),
-            headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            page = json.loads(resp.read())
-        rows += [e["jsonPayload"] for e in page.get("entries", [])]
-        if not page.get("nextPageToken"):
-            break
-        body["pageToken"] = page["nextPageToken"]
+    query = ('resource.type="cloud_run_revision" '
+             f'AND resource.labels.service_name="{service}" '
+             'AND jsonPayload.event="features"')
+    adapter = get_adapter(config.load(strict=False))
+    rows = adapter.read_logs(query, since_minutes=1440, limit=limit)
     return pd.DataFrame(rows[:limit])
 
 

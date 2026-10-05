@@ -58,6 +58,9 @@ class CloudAdapter(ABC):
     def emit_metric(self, name: str, value: float, unit: str = "None") -> None:
         raise NotImplementedError("Lab 4")
 
+    def read_logs(self, query: str, since_minutes: int, limit: int = 5000) -> list[dict[str, Any]]:
+        raise NotImplementedError("Lab 4")
+
     # --- Lab 5 ---------------------------------------------------------------
     def generate(self, prompt: str, params: dict[str, Any]) -> dict[str, Any]:
         """Call a managed LLM endpoint once. Returns at least:
