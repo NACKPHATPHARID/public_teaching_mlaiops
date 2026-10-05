@@ -22,7 +22,7 @@ import pandas as pd
 
 # Conventional PSI reading, and it IS only conventional — it comes from credit scoring,
 # where features are stable and volumes are large. Your problem may warrant something
-# tighter or looser. TODO(Lab 4): state your threshold and why, in your README.
+# tighter or looser. Lab 4: per-feature limits are in drift_job.py, reasoning in the README.
 PSI_NO_CHANGE = 0.10
 PSI_MODERATE = 0.25
 
@@ -124,7 +124,7 @@ def main() -> int:
         print(f"{r.feature:<22}{r.psi:>10.5f}{r.ks_statistic:>10.5f}  {r.verdict}")
 
     if args.emit:
-        # TODO(Lab 4): implement emit_metric in your adapter, then this reaches
+        # Lab 4: emit_metric is implemented in the adapter, so this reaches
         # CloudWatch / Azure Monitor / Cloud Monitoring and your dashboard shows it.
         from cloudlayer.factory import get_adapter
         adapter = get_adapter(config.load(strict=False))

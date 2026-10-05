@@ -17,7 +17,7 @@
      "_note": "If p99 is far above p95 in a repeating pattern, suspect cold start or a per-request model load."},
     {"id": 4, "title": "Feature drift (PSI, rolling)", "type": "timeseries",
      "target": "drift_psi",
-     "_note": "TODO(Lab 4): at least one feature-distribution statistic is required. Emit it from monitoring/drift.py via adapter.emit_metric."},
+     "_note": "Emitted by monitoring/drift_job.py as drift.psi.<feature> through adapter.emit_metric. The deployed dashboard is infra/gcp/dashboard.json."},
     {"id": 5, "title": "Model version in production", "type": "stat",
      "target": "model_version_info",
      "_note": "During a canary you should see two. If you see two when you are not deploying, something is wrong."}
