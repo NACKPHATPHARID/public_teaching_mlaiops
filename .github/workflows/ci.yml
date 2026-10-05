@@ -39,6 +39,9 @@ jobs:
       - name: Portability audit
         run: python scripts/portability_audit.py
 
+      - name: Unit tests
+        run: pytest -q tests/test_unit.py
+
       - name: Generate dataset
         run: python scripts/make_dataset.py
 
@@ -94,7 +97,14 @@ jobs:
           curl -sf -X POST localhost:8080/predict \
             -H 'content-type: application/json' \
             -d '{"temp_c":78.4,"vibration_mm_s":3.1,"pressure_kpa":315.2,"hours_since_service":4200,"load_pct":68,"ambient_humidity":55}' \
-            | tee /dev/stderr | grep -q probability
+            | tee /tmp/resp.json
+          python - <<'PY'
+          import json, os
+          r = json.load(open('/tmp/resp.json'))
+          assert {'probability', 'model_version'} <= set(r), r
+          assert 0.0 <= r['probability'] <= 1.0, r
+          assert r['model_version'] == os.environ['GITHUB_SHA'], r
+          PY
           docker stop svc
 
       # Images are tagged with the commit SHA, never `latest`. A `latest` tag makes it
