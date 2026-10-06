@@ -1,3 +1,11 @@
-# Lab 4 post-mortem: injected temp_c drift
+# Lab 4 post-mortem
 
-The drift alert fired because temp_c reached a PSI of 0.39 against its limit of 0.14 while the other five features stayed near 0. The job flagged it at 17:15:30 and the incident opened at 17:18:06, 16mins after I started injecting at 17:01. The cause was my own test: I shifted temp_c up by 6 (mean 79.6 to 85.6) in the staging traffic, with the schema and null rate unchanged and all 3000 requests succeeding. I would let it be... cuz the pipeline is not broken, rolling back would not help because the model did not change, only its inputs, and retraining on this data would teach the model that hotter machines are normal, so I would retrain only if a real shift kept going and the sensor owner confirmed it. Left unnoticed for a week, every score would run about 14% high (mean risk 0.119 to 0.135), flagging healthy machines and sending crews for nothing, while no errors or slow responses would show it and the availability and latency SLOs would stay green. Most of the 17 mins was waiting for the next 15 mins check, so running it every 5 mins would cut the worst case to about 8 mins, and a range check at the producer would not help because +6 is still in the possible range.
+What fired: The drift alert for temp_c (PSI 0.39, limit 0.14). The job flagged it at 17:15, and the incident opened at 17:18, 16 min after I started the injection at 17:01.
+
+True cause: My own injected +6 shift in temp_c (mean 79.6 to 85.6). Schema and null rate were unchanged and all 3000 rows were valid, so the pipeline was not broken.
+
+Retrain, roll back, or no action: No action. The producer is fine, so there is nothing to fix or roll back, and retraining on the shifted data would bake the offset into the model.
+
+What this would have cost if unnoticed for a week: Scores would run about 14% higher on average (0.119 to 0.135). Latency and errors stay green, so the SLOs would not show it.
+
+How to prevent or detect it faster: Run the job every 5 minutes. A range check on the producer would not catch a +6 shift.
