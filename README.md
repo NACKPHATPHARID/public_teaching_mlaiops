@@ -283,3 +283,20 @@ Caching: the part of the prompt that never changes is about 300 tokens. With cac
 One thing to be careful about: the p95 latency in some of my runs is high because Google rate limited me and my code waited and retried. That is not the model being slow.
 
 Budget defence (for someone who is not an engineer): the assistant that reads machine records costs us about 4.23 THB for every 1,000 requests, so even 100,000 requests a month is only around 423 THB. We got there by testing it on 15 saved examples before every change, and a change that makes the answers worse is blocked automatically, so saving money cannot quietly make the tool worse. What I would ask you to approve is a small monthly limit with an alert, not an open budget, because the main risk is not the price per request, it is someone sending far more requests than planned.
+
+## Lab 5: managed pipeline with an evaluation gate (Task 1)
+
+The pipeline runs on Vertex AI Pipelines and has these steps: ingest (pull the data with dvc and check the file hash), validate (run the tests, and fail if any test is skipped), train, evaluate, and then a condition. Only if the condition says pass does it go on to register the model and deploy it to staging. The pipeline definition is in cloudlayer/vertex_pipeline.py and the compiled file is reports/lab5/pipeline.json.
+
+How the gate decides: the candidate has to reach at least 0.80 on its own, and it has to beat the current model by at least 0.015. The current model is the one with the alias staging in the Vertex model registry, and the gate reads its metric from there. If anything is missing or broken the gate says fail, it never says pass by accident. The step itself always finishes normally and writes pass or fail to a file, so a fail is a real branch of the pipeline and not a crash.
+
+Blocked run (the fail branch): the candidate scored about 0.848 and staging was 0.8533, so it did not beat it by 0.015. The gate said fail, condition-1 was skipped, and nothing was registered or deployed. Screenshot is reports/lab5/task1-run-blocked.png and the registry listing afterwards is reports/lab5/task1-registry-after-blocked.txt, which still shows no new version.
+
+Passing run: I started the pipeline with --incumbent 0.80 so the same candidate could pass. The gate said pass, version 4 was registered with its lineage (git commit, data version, seed, metrics, pipeline run), and it was deployed to staging. Screenshot is reports/lab5/task1-run-pass.png and the evidence is task1-run-pass.txt, task1-registry-after-pass.txt and task1-staging-ready.txt in reports/lab5.
+
+For the grader: the command for the weaker candidate against 0.90, and its non-zero exit, is in reports/lab5/task1-gate-fail.txt.
+
+Things that went wrong on the way:
+- Run 1 failed because the training service account did not have the Vertex AI permission. I added it.
+- Run 2 skipped training because Vertex reused a cached result, so the gate could not find its files. I turned caching off for every step.
+- Run 3 failed because gcloud inside the container did not know the project. I set CLOUDSDK_CORE_PROJECT.
