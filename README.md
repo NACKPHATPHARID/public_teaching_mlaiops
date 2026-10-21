@@ -294,7 +294,7 @@ Blocked run (the fail branch): the candidate scored about 0.848 and staging was 
 
 Passing run: I started the pipeline with --incumbent 0.80 so the same candidate could pass. The gate said pass, version 4 was registered with its lineage (git commit, data version, seed, metrics, pipeline run), and it was deployed to staging. Screenshot is reports/lab5/task1-run-pass.png and the evidence is task1-run-pass.txt, task1-registry-after-pass.txt and task1-staging-ready.txt in reports/lab5.
 
-For the grader: the command for the weaker candidate against 0.90, and its non-zero exit, is in reports/lab5/task1-gate-fail.txt.
+For the grader: run python scripts/evaluation_gate.py --metrics reports/lab5/task1-run-blocked-metrics.json --incumbent 0.90 and it prints GATE FAIL, exits with 1 and registers nothing. The saved output is reports/lab5/task1-gate-fail.txt.
 
 Things that went wrong on the way:
 - Run 1 failed because the training service account did not have the Vertex AI permission. I added it.
