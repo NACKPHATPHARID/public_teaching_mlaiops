@@ -199,3 +199,36 @@ Only the range test caught it, which is why both exist.
 ### Which statistic caught which fault
 
 I ran all the injection modes (`reports/lab4/task6-modes.txt`). A mean shift of +2 gave PSI 0.042 and KS 0.088, under my temp_c limit of 0.14, so it would not alert. A shift of +6 gave PSI 0.383 and KS 0.246, which did fire. Scaling by 1.5 leaves the mean at 79.58, yet PSI reached 0.206 while KS was only 0.114, so PSI is better at catching a change in spread. The mix mode, the most realistic one, gave PSI 0.009 and KS 0.034 and stayed stable, so a slow change in the mix of machines would slip past this detector. To catch it I would need a longer window or a check on prediction quality, not only input drift.
+
+## Lab 5: least privilege (Task 2)
+
+I made three accounts instead of one. Each only gets what it needs.
+
+- training-runtime: runs the pipeline. It can use Vertex AI, deploy to Cloud Run, pull images and read and write my bucket. It needs all of that because the pipeline trains, registers and deploys.
+- serving-runtime: runs the web service. It can only read files in my bucket, because the service only loads one model file when it starts.
+- github-ci: builds and deploys after a merge. It can push images and deploy to Cloud Run.
+
+Not perfect: training-runtime is the biggest account because one pipeline does everything. github-ci has full Cloud Run admin, which is probably too much, but I didn't test a smaller role. It also can't start the pipeline, so I run that from my laptop.
+
+What broke when permissions were missing:
+
+1. My first pipeline run failed right away with "Permission aiplatform.metadataStores.get denied". The training account could only pull images. I gave it the Vertex AI user role and it worked. Evidence is in reports/lab5/task2-first-failure.txt.
+2. I removed the serving account's only permission (reading the bucket) and deployed again. The new version never got ready. The log only said "model not loaded", not "permission denied", so I only knew why because I had just removed it. Cloud Run kept sending traffic to the old working version. Evidence is in reports/lab5/task2-removed-permission.txt, task2-removed-permission-log.txt and task2-old-revision-still-ready.txt.
+
+So a missing permission does not always say "permission denied". Sometimes it just looks like the model is broken.
+
+## Lab 5: scheduled retraining (Task 3)
+
+The pipeline runs every Sunday at 2am (cron 0 2 * * 0 in pipeline/pipeline.yaml). Nobody uses it then, and the gate blocks a bad model anyway.
+
+I'm guessing the true label shows up about a week after the reading, so running more often than weekly wouldn't give much new data.
+
+Three ways to decide when to retrain:
+
+- Fixed schedule. Good when the data changes slowly and you want a cost you can predict. It goes wrong because it retrains even if nothing changed, and it waits a week if something breaks.
+- Data volume (retrain after N new rows). Good when new data comes in big chunks. It goes wrong if the new data is bad but there is a lot of it, or if very little arrives and the model gets old.
+- Drift (retrain when the data changes). Good when the data changes fast. It goes wrong when the "drift" is really a broken sensor, so it retrains on junk.
+
+I picked the fixed weekly schedule, with the gate before register.
+
+Worst case: a sensor breaks and sends junk. A drift trigger sees drift, retrains on the junk, and the new model can pass because it is tested on the same junk. A working model gets replaced in hours, maybe again and again. With a weekly schedule it can only happen once a week, and the validate step (the Lab 4 data tests) blocks obviously broken data.
