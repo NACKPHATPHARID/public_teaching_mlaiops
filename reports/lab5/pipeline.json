@@ -273,11 +273,15 @@
               "value": "5"
             },
             {
+              "name": "SERVING_SA",
+              "value": "serving-runtime@itcs355-6688165.iam.gserviceaccount.com"
+            },
+            {
               "name": "GIT_COMMIT",
-              "value": "7a2ff14176af2b9b84633ad883c71fd0e1b755e5"
+              "value": "7e7343adad719e0c405f4d7ac3d092adc4323785"
             }
           ],
-          "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:552f9c98c4e6567b33bbd38470768e588fb2e5c780716580a4c4d22344620376"
+          "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:e5fc07ab342138d1de35114a99ee1a1ebcab79fe9efaac7f7125b7026349dc63"
         }
       },
       "exec-sh-2": {
@@ -335,11 +339,15 @@
               "value": "5"
             },
             {
+              "name": "SERVING_SA",
+              "value": "serving-runtime@itcs355-6688165.iam.gserviceaccount.com"
+            },
+            {
               "name": "GIT_COMMIT",
-              "value": "7a2ff14176af2b9b84633ad883c71fd0e1b755e5"
+              "value": "7e7343adad719e0c405f4d7ac3d092adc4323785"
             }
           ],
-          "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:552f9c98c4e6567b33bbd38470768e588fb2e5c780716580a4c4d22344620376"
+          "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:e5fc07ab342138d1de35114a99ee1a1ebcab79fe9efaac7f7125b7026349dc63"
         }
       },
       "exec-sh-3": {
@@ -397,11 +405,15 @@
               "value": "5"
             },
             {
+              "name": "SERVING_SA",
+              "value": "serving-runtime@itcs355-6688165.iam.gserviceaccount.com"
+            },
+            {
               "name": "GIT_COMMIT",
-              "value": "7a2ff14176af2b9b84633ad883c71fd0e1b755e5"
+              "value": "7e7343adad719e0c405f4d7ac3d092adc4323785"
             }
           ],
-          "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:552f9c98c4e6567b33bbd38470768e588fb2e5c780716580a4c4d22344620376",
+          "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:e5fc07ab342138d1de35114a99ee1a1ebcab79fe9efaac7f7125b7026349dc63",
           "resources": {
             "cpuLimit": 4.0,
             "memoryLimit": 8.0,
@@ -465,11 +477,15 @@
               "value": "5"
             },
             {
+              "name": "SERVING_SA",
+              "value": "serving-runtime@itcs355-6688165.iam.gserviceaccount.com"
+            },
+            {
               "name": "GIT_COMMIT",
-              "value": "7a2ff14176af2b9b84633ad883c71fd0e1b755e5"
+              "value": "7e7343adad719e0c405f4d7ac3d092adc4323785"
             }
           ],
-          "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:552f9c98c4e6567b33bbd38470768e588fb2e5c780716580a4c4d22344620376"
+          "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:e5fc07ab342138d1de35114a99ee1a1ebcab79fe9efaac7f7125b7026349dc63"
         }
       },
       "exec-sh-5": {
@@ -527,11 +543,15 @@
               "value": "5"
             },
             {
+              "name": "SERVING_SA",
+              "value": "serving-runtime@itcs355-6688165.iam.gserviceaccount.com"
+            },
+            {
               "name": "GIT_COMMIT",
-              "value": "7a2ff14176af2b9b84633ad883c71fd0e1b755e5"
+              "value": "7e7343adad719e0c405f4d7ac3d092adc4323785"
             }
           ],
-          "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:552f9c98c4e6567b33bbd38470768e588fb2e5c780716580a4c4d22344620376"
+          "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:e5fc07ab342138d1de35114a99ee1a1ebcab79fe9efaac7f7125b7026349dc63"
         }
       },
       "exec-sh-6": {
@@ -589,11 +609,15 @@
               "value": "5"
             },
             {
+              "name": "SERVING_SA",
+              "value": "serving-runtime@itcs355-6688165.iam.gserviceaccount.com"
+            },
+            {
               "name": "GIT_COMMIT",
-              "value": "7a2ff14176af2b9b84633ad883c71fd0e1b755e5"
+              "value": "7e7343adad719e0c405f4d7ac3d092adc4323785"
             }
           ],
-          "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:552f9c98c4e6567b33bbd38470768e588fb2e5c780716580a4c4d22344620376"
+          "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:e5fc07ab342138d1de35114a99ee1a1ebcab79fe9efaac7f7125b7026349dc63"
         }
       }
     }
