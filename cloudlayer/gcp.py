@@ -518,3 +518,24 @@ class GcpAdapter(CloudAdapter):
             if not page_token:
                 break
         return out
+
+    def get_model_metric(self, name: str, alias: str, key: str = "metric_test") -> float | None:
+        """Read `key` for the Vertex model version that carries `alias`. GCP mangles the
+        label copy ('0.8533' becomes '0-8533'), so read the exact value from the version
+        description. Returns None when no version has the alias."""
+        import json as _json
+
+        parent = self._find_model(name)
+        if not parent:
+            return None
+        model_id = str(parent).split("/")[-1].split("@")[0]
+        out = subprocess.run(
+            ["gcloud", "ai", "models", "list-version", model_id,
+             "--region", self.cfg.region, "--format=json"],
+            capture_output=True, text=True, check=True)
+        for version in _json.loads(out.stdout):
+            if alias in version.get("versionAliases", []):
+                for line in version.get("versionDescription", "").splitlines():
+                    if line.startswith(f"{key}="):
+                        return float(line.split("=", 1)[1])
+        return None
