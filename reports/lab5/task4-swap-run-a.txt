@@ -1,0 +1,17 @@
+primary   gcp
+secondary aws
+
+  [FAIL            ] upload  ValueError: AWS adapter needs an s3:// address, got gs://itcs355-6688165/itcs355
+  [FAIL            ] download  ValueError: AWS adapter needs an s3:// address, got gs://itcs355-6688165/itcs355/portability/probe.txt
+  [FAIL            ] invoke  ClientError: An error occurred (500) when calling the InvokeEndpoint operation (reached max retries: 4): <!doctype html>
+<html lang=en>
+<title>500 Internal Server Error</title>
+<h1>Internal Server Error</h1>
+<p>The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.</p>
+
+
+Write-up (Lab 5 Task 4), half a page:
+  - which method was hardest to port, and why
+  - one place the abstraction genuinely leaked and could not be hidden
+  - what a full migration would cost in engineering days
+  - was building this abstraction worth it? A well-argued 'no' scores full marks.

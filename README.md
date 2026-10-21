@@ -232,3 +232,22 @@ Three ways to decide when to retrain:
 I picked the fixed weekly schedule, with the gate before register.
 
 Worst case: a sensor breaks and sends junk. A drift trigger sees drift, retrains on the junk, and the new model can pass because it is tested on the same junk. A working model gets replaced in hours, maybe again and again. With a weekly schedule it can only happen once a week, and the validate step (the Lab 4 data tests) blocks obviously broken data.
+
+## Lab 5: portability test (Task 4)
+
+The audit (make portability-audit) passes: no provider names in src, service, monitoring or tests.
+
+For the swap I wrote upload, download and invoke for AWS in cloudlayer/aws.py using boto3. I don't have an AWS account, so I tested against moto, a fake AWS that runs on my laptop. So the code is real but the server was pretend. Nothing here tested real AWS logins or a real SageMaker endpoint.
+
+I ran the swap check three times (reports/lab5/task4-swap-run-a.txt, b and c):
+- Run A failed on upload and download. My BLOB_URI is a gs:// address and the AWS adapter needs s3://.
+- Run B fixed BLOB_URI. Upload and download passed, but invoke failed because my REGION is asia-southeast1, which is a Google region and means nothing to AWS.
+- Run C changed both settings and all three passed.
+
+Which was hardest: invoke. Upload and download are almost the same on every cloud. Invoke needs a real deployed endpoint, and what comes back depends on the model container, so it was not always JSON. I had to handle that.
+
+Where the abstraction leaked: config. The code behind the adapter is clean, but BLOB_URI and REGION only make sense for one provider. The audit passed in run A and the swap still failed, so a clean audit does not mean it is portable.
+
+Full migration cost: upload, download and invoke took me about an hour. A full move also needs training jobs, the model registry, deploy, metrics, logs, the pipeline and IAM, and each of those works differently. I'd guess 15 to 25 days for one person.
+
+Was it worth it: only a bit. It forced me to keep provider code in one folder, and it made the fake AWS test easy. But it is not free, because the config still leaks and the adapters need upkeep. If nobody plans to leave Google Cloud, I would not build it. I'm glad I did here because the lab needed it, but for a real small project I would choose lock in on purpose.
