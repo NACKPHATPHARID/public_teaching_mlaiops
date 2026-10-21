@@ -4,9 +4,7 @@
       "dag": {
         "tasks": {
           "sh-5": {
-            "cachingOptions": {
-              "enableCache": true
-            },
+            "cachingOptions": {},
             "componentRef": {
               "name": "comp-sh-5"
             },
@@ -24,7 +22,7 @@
                 },
                 "script": {
                   "runtimeValue": {
-                    "constant": "mkdir -p \"$(dirname \"$1\")\" && python scripts/register.py --run-dir \"$2\" --run-id \"$3\" --version-out \"$1\""
+                    "constant": "mkdir -p \"$(dirname \"$1\")\" && gcloud config list 2>&1; python scripts/register.py --run-dir \"$2\" --run-id \"$3\" --version-out \"$1\""
                   }
                 }
               }
@@ -34,9 +32,7 @@
             }
           },
           "sh-6": {
-            "cachingOptions": {
-              "enableCache": true
-            },
+            "cachingOptions": {},
             "componentRef": {
               "name": "comp-sh-6"
             },
@@ -273,12 +269,20 @@
               "value": "5"
             },
             {
+              "name": "CLOUDSDK_CORE_PROJECT",
+              "value": "itcs355-6688165"
+            },
+            {
+              "name": "CLOUDSDK_CORE_DISABLE_PROMPTS",
+              "value": "1"
+            },
+            {
               "name": "SERVING_SA",
               "value": "serving-runtime@itcs355-6688165.iam.gserviceaccount.com"
             },
             {
               "name": "GIT_COMMIT",
-              "value": "7e7343adad719e0c405f4d7ac3d092adc4323785"
+              "value": "61e009e6c2774cd091d0dd1979941adda2f06641"
             }
           ],
           "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:e5fc07ab342138d1de35114a99ee1a1ebcab79fe9efaac7f7125b7026349dc63"
@@ -339,12 +343,20 @@
               "value": "5"
             },
             {
+              "name": "CLOUDSDK_CORE_PROJECT",
+              "value": "itcs355-6688165"
+            },
+            {
+              "name": "CLOUDSDK_CORE_DISABLE_PROMPTS",
+              "value": "1"
+            },
+            {
               "name": "SERVING_SA",
               "value": "serving-runtime@itcs355-6688165.iam.gserviceaccount.com"
             },
             {
               "name": "GIT_COMMIT",
-              "value": "7e7343adad719e0c405f4d7ac3d092adc4323785"
+              "value": "61e009e6c2774cd091d0dd1979941adda2f06641"
             }
           ],
           "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:e5fc07ab342138d1de35114a99ee1a1ebcab79fe9efaac7f7125b7026349dc63"
@@ -405,12 +417,20 @@
               "value": "5"
             },
             {
+              "name": "CLOUDSDK_CORE_PROJECT",
+              "value": "itcs355-6688165"
+            },
+            {
+              "name": "CLOUDSDK_CORE_DISABLE_PROMPTS",
+              "value": "1"
+            },
+            {
               "name": "SERVING_SA",
               "value": "serving-runtime@itcs355-6688165.iam.gserviceaccount.com"
             },
             {
               "name": "GIT_COMMIT",
-              "value": "7e7343adad719e0c405f4d7ac3d092adc4323785"
+              "value": "61e009e6c2774cd091d0dd1979941adda2f06641"
             }
           ],
           "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:e5fc07ab342138d1de35114a99ee1a1ebcab79fe9efaac7f7125b7026349dc63",
@@ -477,12 +497,20 @@
               "value": "5"
             },
             {
+              "name": "CLOUDSDK_CORE_PROJECT",
+              "value": "itcs355-6688165"
+            },
+            {
+              "name": "CLOUDSDK_CORE_DISABLE_PROMPTS",
+              "value": "1"
+            },
+            {
               "name": "SERVING_SA",
               "value": "serving-runtime@itcs355-6688165.iam.gserviceaccount.com"
             },
             {
               "name": "GIT_COMMIT",
-              "value": "7e7343adad719e0c405f4d7ac3d092adc4323785"
+              "value": "61e009e6c2774cd091d0dd1979941adda2f06641"
             }
           ],
           "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:e5fc07ab342138d1de35114a99ee1a1ebcab79fe9efaac7f7125b7026349dc63"
@@ -543,12 +571,20 @@
               "value": "5"
             },
             {
+              "name": "CLOUDSDK_CORE_PROJECT",
+              "value": "itcs355-6688165"
+            },
+            {
+              "name": "CLOUDSDK_CORE_DISABLE_PROMPTS",
+              "value": "1"
+            },
+            {
               "name": "SERVING_SA",
               "value": "serving-runtime@itcs355-6688165.iam.gserviceaccount.com"
             },
             {
               "name": "GIT_COMMIT",
-              "value": "7e7343adad719e0c405f4d7ac3d092adc4323785"
+              "value": "61e009e6c2774cd091d0dd1979941adda2f06641"
             }
           ],
           "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:e5fc07ab342138d1de35114a99ee1a1ebcab79fe9efaac7f7125b7026349dc63"
@@ -609,12 +645,20 @@
               "value": "5"
             },
             {
+              "name": "CLOUDSDK_CORE_PROJECT",
+              "value": "itcs355-6688165"
+            },
+            {
+              "name": "CLOUDSDK_CORE_DISABLE_PROMPTS",
+              "value": "1"
+            },
+            {
               "name": "SERVING_SA",
               "value": "serving-runtime@itcs355-6688165.iam.gserviceaccount.com"
             },
             {
               "name": "GIT_COMMIT",
-              "value": "7e7343adad719e0c405f4d7ac3d092adc4323785"
+              "value": "61e009e6c2774cd091d0dd1979941adda2f06641"
             }
           ],
           "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:e5fc07ab342138d1de35114a99ee1a1ebcab79fe9efaac7f7125b7026349dc63"
@@ -653,9 +697,7 @@
           }
         },
         "sh": {
-          "cachingOptions": {
-            "enableCache": true
-          },
+          "cachingOptions": {},
           "componentRef": {
             "name": "comp-sh"
           },
@@ -683,9 +725,7 @@
           }
         },
         "sh-2": {
-          "cachingOptions": {
-            "enableCache": true
-          },
+          "cachingOptions": {},
           "componentRef": {
             "name": "comp-sh-2"
           },
@@ -716,9 +756,7 @@
           }
         },
         "sh-3": {
-          "cachingOptions": {
-            "enableCache": true
-          },
+          "cachingOptions": {},
           "componentRef": {
             "name": "comp-sh-3"
           },
@@ -749,9 +787,7 @@
           }
         },
         "sh-4": {
-          "cachingOptions": {
-            "enableCache": true
-          },
+          "cachingOptions": {},
           "componentRef": {
             "name": "comp-sh-4"
           },
