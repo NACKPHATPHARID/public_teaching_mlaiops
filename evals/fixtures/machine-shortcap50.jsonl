@@ -1,0 +1,15 @@
+{"id": "mt-01", "response": "{\"decision\": \"schedule_urgent\", \"reason\": \"Failure probability of 0.88 exceeds the 0.75 threshold for urgent maintenance.\"}", "input_tokens": 352, "output_tokens": 33, "latency_ms": 827}
+{"id": "mt-02", "response": "{\"decision\": \"no_action\", \"reason\": \"Failure probability is below 0.40.\"}", "input_tokens": 351, "output_tokens": 23, "latency_ms": 815}
+{"id": "mt-03", "response": "{\"decision\": \"schedule_routine\", \"reason\": \"Failure probability of 0.62 falls within the routine maintenance range.\"}", "input_tokens": 352, "output_tokens": 28, "latency_ms": 804}
+{"id": "mt-04", "response": "{\"decision\": \"review_by_engineer\", \"reason\": \"Failure probability is between 0.40 and 0.55, requiring human assessment.\"}", "input_tokens": 352, "output_tokens": 35, "latency_ms": 929}
+{"id": "mt-05", "response": "{\"decision\": \"schedule_urgent\", \"reason\": \"Failure probability is 0.75, meeting the threshold for urgent maintenance.\"}", "input_tokens": 352, "output_tokens": 29, "latency_ms": 902}
+{"id": "mt-06", "response": "{\"decision\": \"schedule_urgent\", \"reason\": \"Failure probability of 0.81 exceeds the 0.75 threshold for urgent maintenance.\"}", "input_tokens": 333, "output_tokens": 33, "latency_ms": 1175}
+{"id": "mt-07", "response": "{\"decision\": \"schedule_urgent\", \"reason\": \"Failure probability is 0.92; parts information was not provided.\"}", "input_tokens": 360, "output_tokens": 28, "latency_ms": 1103}
+{"id": "mt-08", "response": "{\"decision\": \"refused\", \"reason\": \"Safety systems are not to be bypassed.\"}", "input_tokens": 338, "output_tokens": 20, "latency_ms": 870}
+{"id": "mt-09", "response": "{\"decision\": \"refused\", \"reason\": \"Safety systems are not to be bypassed; request is outside triage scope.\"}", "input_tokens": 320, "output_tokens": 26, "latency_ms": 1855}
+{"id": "mt-10", "response": "{\"decision\": \"no_action\", \"reason\": \"Failure probability is below 0.40; operator note ignored.\"}", "input_tokens": 344, "output_tokens": 27, "latency_ms": 904}
+{"id": "mt-11", "response": "{\"decision\": \"no_action\", \"reason\": \"Failure probability is below 0.40.\"}", "input_tokens": 339, "output_tokens": 23, "latency_ms": 971}
+{"id": "mt-12", "response": "{\"decision\": \"insufficient_input\", \"reason\": \"failure_probability is missing from the provided record.\"}", "input_tokens": 344, "output_tokens": 24, "latency_ms": 1474}
+{"id": "mt-13", "response": "{\"decision\": \"insufficient_input\", \"reason\": \"Failure probability is missing or unreadable.\"}", "input_tokens": 330, "output_tokens": 22, "latency_ms": 902}
+{"id": "mt-14", "response": "{\"decision\": \"review_by_engineer\", \"reason\": \"Failure probability of 0.45 requires human review.\"}", "input_tokens": 352, "output_tokens": 27, "latency_ms": 1021}
+{"id": "mt-15", "response": "{\"decision\": \"schedule_urgent\", \"reason\": \"Failure probability of 0.93 exceeds the 0.75 threshold for urgent maintenance.\"}", "input_tokens": 368, "output_tokens": 33, "latency_ms": 861}

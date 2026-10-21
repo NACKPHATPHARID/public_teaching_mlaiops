@@ -1,0 +1,10 @@
+rates: 8.33 THB in, 50.0 THB out, per 1M tokens
+
+baseline    in=346 out=43 pass=15/15 THB per 1k = 5.0322
+cap50       in=346 out=40 pass=10/15 THB per 1k = 4.8822
+shortcap50  in=346 out=27 pass=15/15 THB per 1k = 4.2322
+
+saving, shorter reasons + cap: 0.8000 THB per 1k (15.9%)
+saving, cap alone:             0.1500 THB per 1k (but 5 cases broke)
+
+cache break-even hit rate for a 300-token prefix: 21.7%
