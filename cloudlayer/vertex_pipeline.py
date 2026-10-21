@@ -29,7 +29,7 @@ TRAIN = PREP + (
 GATE = PREP + (
     'python scripts/evaluation_gate.py --metrics "$2/metrics.json" $3 --decision-out "$1"; '
     'tr -d "[:space:]" < "$1" > /tmp/d && cp /tmp/d "$1"')
-REGISTER = PREP + 'python scripts/register.py --run-dir "$2" --run-id "$3" --version-out "$1"'
+REGISTER = PREP + 'gcloud config list 2>&1; python scripts/register.py --run-dir "$2" --run-id "$3" --version-out "$1"'
 DEPLOY = PREP + (
     'printf %s "$2" > /tmp/v && python scripts/deploy.py --version-file /tmp/v && echo ok > "$1"')
 
@@ -85,6 +85,8 @@ def compile_and_submit(spec=None, submit: bool = True):
     env = {k: os.environ[k] for k in ENV_SLOTS}
     env["SERVE_IMAGE_URI"] = os.environ["SERVE_IMAGE_URI"]
     env["LAB"] = "5"
+    env["CLOUDSDK_CORE_PROJECT"] = os.environ["PROJECT_ID"]
+    env["CLOUDSDK_CORE_DISABLE_PROMPTS"] = "1"
     env["SERVING_SA"] = os.environ["SERVING_SA"]
     env["GIT_COMMIT"] = _git()
 
