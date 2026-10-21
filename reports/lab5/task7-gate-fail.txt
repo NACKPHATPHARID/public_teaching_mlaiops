@@ -1,0 +1,34 @@
+golden set  machine-triage.jsonl  (15 cases)
+  [PASS] mt-01
+  [PASS] mt-02
+  [PASS] mt-03
+  [PASS] mt-04
+  [PASS] mt-05
+  [PASS] mt-06
+  [FAIL] mt-07
+         expected decision='schedule_urgent', got 'refused'
+  [PASS] mt-08
+  [PASS] mt-09
+  [FAIL] mt-10
+         expected decision='no_action', got 'refused'
+  [FAIL] mt-11
+         expected decision='no_action', got 'refused'
+  [PASS] mt-12
+  [PASS] mt-13
+  [PASS] mt-14
+  [FAIL] mt-15
+         expected decision='schedule_urgent', got 'refused'
+
+pass rate           11/15  (73.3%)
+p95 latency         1337 ms
+cost per 1k reqs    4.3407 THB  (gcp/small)
+wrote reports/llm_eval-machine-v2.json
+
+baseline pass rate  1.0
+current  pass rate  0.7333
+
+GATE FAILED — 4 regression(s): mt-07, mt-10, mt-11, mt-15
+    mt-07: expected decision='schedule_urgent', got 'refused'
+    mt-10: expected decision='no_action', got 'refused'
+    mt-11: expected decision='no_action', got 'refused'
+    mt-15: expected decision='schedule_urgent', got 'refused'

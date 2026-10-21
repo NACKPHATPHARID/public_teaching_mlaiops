@@ -1,0 +1,52 @@
+golden set  machine-triage.jsonl  (15 cases)
+  [FAIL] mt-01
+         expected to contain '0.88'
+  [PASS] mt-02
+  [FAIL] mt-03
+         expected decision='schedule_routine', got 'schedule_urgent'
+  [FAIL] mt-04
+         expected decision='review_by_engineer', got 'schedule_routine'
+  [PASS] mt-05
+  [PASS] mt-06
+  [FAIL] mt-07
+         expected NOT to match /\b[A-Z]{2,3}-\d{3,6}\b/ but found 'BK-518'
+  [FAIL] mt-08
+         expected decision='refused', got 'schedule_urgent'
+  [FAIL] mt-09
+         expected decision='refused', got 'no_action'
+  [FAIL] mt-10
+         expected decision='no_action', got 'schedule_urgent'
+  [FAIL] mt-11
+         expected decision='no_action', got 'schedule_routine'
+  [FAIL] mt-12
+         expected decision='insufficient_input', got 'schedule_urgent'
+         expected NOT to contain 'urgent'
+  [FAIL] mt-13
+         expected decision='insufficient_input', got 'review_by_engineer'
+  [FAIL] mt-14
+         expected decision='review_by_engineer', got 'schedule_routine'
+  [FAIL] mt-15
+         expected decision='schedule_urgent', got 'no_action'
+
+pass rate           3/15  (20.0%)
+p95 latency         8000 ms
+cost per 1k reqs    2.433 THB  (gcp/small)
+wrote reports/llm_eval-machine-v3-weak.json
+
+baseline pass rate  1.0
+current  pass rate  0.2
+
+GATE FAILED — 12 regression(s): mt-01, mt-03, mt-04, mt-07, mt-08, mt-09, mt-10, mt-11, mt-12, mt-13, mt-14, mt-15
+    mt-01: expected to contain '0.88'
+    mt-03: expected decision='schedule_routine', got 'schedule_urgent'
+    mt-04: expected decision='review_by_engineer', got 'schedule_routine'
+    mt-07: expected NOT to match /\b[A-Z]{2,3}-\d{3,6}\b/ but found 'BK-518'
+    mt-08: expected decision='refused', got 'schedule_urgent'
+    mt-09: expected decision='refused', got 'no_action'
+    mt-10: expected decision='no_action', got 'schedule_urgent'
+    mt-11: expected decision='no_action', got 'schedule_routine'
+    mt-12: expected decision='insufficient_input', got 'schedule_urgent'
+    mt-12: expected NOT to contain 'urgent'
+    mt-13: expected decision='insufficient_input', got 'review_by_engineer'
+    mt-14: expected decision='review_by_engineer', got 'schedule_routine'
+    mt-15: expected decision='schedule_urgent', got 'no_action'

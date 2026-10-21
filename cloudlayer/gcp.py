@@ -539,3 +539,52 @@ class GcpAdapter(CloudAdapter):
                     if line.startswith(f"{key}="):
                         return float(line.split("=", 1)[1])
         return None
+
+    def generate(self, prompt: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+        """One call to a Gemini model on Vertex AI (global endpoint).
+
+        params: model, max_output_tokens, temperature, system (a system prompt string).
+        Token counts are the provider's own usageMetadata, never estimated.
+        """
+        import time
+        import urllib.error
+        import urllib.request
+
+        params = params or {}
+        model = params.get("model", "gemini-3.1-flash-lite")
+        body: dict[str, Any] = {
+            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+            "generationConfig": {
+                "maxOutputTokens": int(params.get("max_output_tokens", 200)),
+                "temperature": float(params.get("temperature", 0.0)),
+            },
+        }
+        if params.get("system"):
+            body["systemInstruction"] = {"parts": [{"text": params["system"]}]}
+        url = ("https://aiplatform.googleapis.com/v1/projects/"
+               f"{self.cfg.project_id}/locations/global/publishers/google/models/{model}:generateContent")
+        req = urllib.request.Request(url, data=json.dumps(body).encode(), method="POST", headers={
+            "Authorization": f"Bearer {self._access_token()}", "Content-Type": "application/json"})
+        data = {}
+        latency_ms = 0
+        for attempt in range(6):
+            start = time.time()
+            try:
+                with urllib.request.urlopen(req, timeout=60) as resp:
+                    data = json.loads(resp.read())
+                latency_ms = int((time.time() - start) * 1000)
+                break
+            except urllib.error.HTTPError as err:
+                # 429 = rate limited, 503 = busy. Wait longer each time, then give up.
+                if err.code not in (429, 503) or attempt == 5:
+                    raise
+                time.sleep(2 ** attempt)
+
+        parts = (data.get("candidates") or [{}])[0].get("content", {}).get("parts", [])
+        usage = data.get("usageMetadata", {})
+        return {
+            "response": "".join(p.get("text", "") for p in parts),
+            "input_tokens": usage.get("promptTokenCount", 0),
+            "output_tokens": usage.get("candidatesTokenCount", 0) + usage.get("thoughtsTokenCount", 0),
+            "latency_ms": latency_ms,
+        }
