@@ -54,6 +54,7 @@ def build(image: str, run_dir: str, env: dict):
             dep = sh(script=DEPLOY, a=reg.outputs["out"], b="-")
             dep.set_display_name("deploy_staging")
         for task in (ingest, validate, train, gate, reg, dep):
+            task.set_caching_options(False)
             for k, v in env.items():
                 task.set_env_variable(k, v)
 
