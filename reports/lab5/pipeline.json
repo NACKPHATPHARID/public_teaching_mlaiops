@@ -1,0 +1,772 @@
+{
+  "components": {
+    "comp-condition-1": {
+      "dag": {
+        "tasks": {
+          "sh-5": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-sh-5"
+            },
+            "inputs": {
+              "parameters": {
+                "a": {
+                  "runtimeValue": {
+                    "constant": "/gcs/itcs355-6688165/itcs355/lab5/runs/{{$.pipeline_job_uuid}}"
+                  }
+                },
+                "b": {
+                  "runtimeValue": {
+                    "constant": "{{$.pipeline_job_uuid}}"
+                  }
+                },
+                "script": {
+                  "runtimeValue": {
+                    "constant": "mkdir -p \"$(dirname \"$1\")\" && python scripts/register.py --run-dir \"$2\" --run-id \"$3\" --version-out \"$1\""
+                  }
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "register"
+            }
+          },
+          "sh-6": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-sh-6"
+            },
+            "dependentTasks": [
+              "sh-5"
+            ],
+            "inputs": {
+              "parameters": {
+                "a": {
+                  "taskOutputParameter": {
+                    "outputParameterKey": "out",
+                    "producerTask": "sh-5"
+                  }
+                },
+                "b": {
+                  "runtimeValue": {
+                    "constant": "-"
+                  }
+                },
+                "script": {
+                  "runtimeValue": {
+                    "constant": "mkdir -p \"$(dirname \"$1\")\" && printf %s \"$2\" > /tmp/v && python scripts/deploy.py --version-file /tmp/v && echo ok > \"$1\""
+                  }
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "deploy_staging"
+            }
+          }
+        }
+      },
+      "inputDefinitions": {
+        "parameters": {
+          "pipelinechannel--sh-4-out": {
+            "parameterType": "STRING"
+          }
+        }
+      }
+    },
+    "comp-sh": {
+      "executorLabel": "exec-sh",
+      "inputDefinitions": {
+        "parameters": {
+          "a": {
+            "parameterType": "STRING"
+          },
+          "b": {
+            "parameterType": "STRING"
+          },
+          "script": {
+            "parameterType": "STRING"
+          }
+        }
+      },
+      "outputDefinitions": {
+        "parameters": {
+          "out": {
+            "parameterType": "STRING"
+          }
+        }
+      }
+    },
+    "comp-sh-2": {
+      "executorLabel": "exec-sh-2",
+      "inputDefinitions": {
+        "parameters": {
+          "a": {
+            "parameterType": "STRING"
+          },
+          "b": {
+            "parameterType": "STRING"
+          },
+          "script": {
+            "parameterType": "STRING"
+          }
+        }
+      },
+      "outputDefinitions": {
+        "parameters": {
+          "out": {
+            "parameterType": "STRING"
+          }
+        }
+      }
+    },
+    "comp-sh-3": {
+      "executorLabel": "exec-sh-3",
+      "inputDefinitions": {
+        "parameters": {
+          "a": {
+            "parameterType": "STRING"
+          },
+          "b": {
+            "parameterType": "STRING"
+          },
+          "script": {
+            "parameterType": "STRING"
+          }
+        }
+      },
+      "outputDefinitions": {
+        "parameters": {
+          "out": {
+            "parameterType": "STRING"
+          }
+        }
+      }
+    },
+    "comp-sh-4": {
+      "executorLabel": "exec-sh-4",
+      "inputDefinitions": {
+        "parameters": {
+          "a": {
+            "parameterType": "STRING"
+          },
+          "b": {
+            "parameterType": "STRING"
+          },
+          "script": {
+            "parameterType": "STRING"
+          }
+        }
+      },
+      "outputDefinitions": {
+        "parameters": {
+          "out": {
+            "parameterType": "STRING"
+          }
+        }
+      }
+    },
+    "comp-sh-5": {
+      "executorLabel": "exec-sh-5",
+      "inputDefinitions": {
+        "parameters": {
+          "a": {
+            "parameterType": "STRING"
+          },
+          "b": {
+            "parameterType": "STRING"
+          },
+          "script": {
+            "parameterType": "STRING"
+          }
+        }
+      },
+      "outputDefinitions": {
+        "parameters": {
+          "out": {
+            "parameterType": "STRING"
+          }
+        }
+      }
+    },
+    "comp-sh-6": {
+      "executorLabel": "exec-sh-6",
+      "inputDefinitions": {
+        "parameters": {
+          "a": {
+            "parameterType": "STRING"
+          },
+          "b": {
+            "parameterType": "STRING"
+          },
+          "script": {
+            "parameterType": "STRING"
+          }
+        }
+      },
+      "outputDefinitions": {
+        "parameters": {
+          "out": {
+            "parameterType": "STRING"
+          }
+        }
+      }
+    }
+  },
+  "deploymentSpec": {
+    "executors": {
+      "exec-sh": {
+        "container": {
+          "args": [
+            "{{$.inputs.parameters['script']}}",
+            "step",
+            "{{$.outputs.parameters['out'].output_file}}",
+            "{{$.inputs.parameters['a']}}",
+            "{{$.inputs.parameters['b']}}"
+          ],
+          "command": [
+            "/bin/sh",
+            "-c"
+          ],
+          "env": [
+            {
+              "name": "CLOUD_PROVIDER",
+              "value": "gcp"
+            },
+            {
+              "name": "PROJECT_ID",
+              "value": "itcs355-6688165"
+            },
+            {
+              "name": "REGION",
+              "value": "asia-southeast1"
+            },
+            {
+              "name": "BLOB_URI",
+              "value": "gs://itcs355-6688165/itcs355"
+            },
+            {
+              "name": "CONTAINER_REGISTRY",
+              "value": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355"
+            },
+            {
+              "name": "MLFLOW_TRACKING_URI",
+              "value": "sqlite:///mlflow.db"
+            },
+            {
+              "name": "MODEL_REGISTRY_NAME",
+              "value": "itcs355-6688165"
+            },
+            {
+              "name": "IDENTITY_REF",
+              "value": "training-runtime@itcs355-6688165.iam.gserviceaccount.com"
+            },
+            {
+              "name": "SERVE_IMAGE_URI",
+              "value": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-serve@sha256:0483b0523045bdaf7d61dd9a6781c6a018a4b106572df7d3c449c0ed28454dc5"
+            },
+            {
+              "name": "LAB",
+              "value": "5"
+            },
+            {
+              "name": "GIT_COMMIT",
+              "value": "7a2ff14176af2b9b84633ad883c71fd0e1b755e5"
+            }
+          ],
+          "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:552f9c98c4e6567b33bbd38470768e588fb2e5c780716580a4c4d22344620376"
+        }
+      },
+      "exec-sh-2": {
+        "container": {
+          "args": [
+            "{{$.inputs.parameters['script']}}",
+            "step",
+            "{{$.outputs.parameters['out'].output_file}}",
+            "{{$.inputs.parameters['a']}}",
+            "{{$.inputs.parameters['b']}}"
+          ],
+          "command": [
+            "/bin/sh",
+            "-c"
+          ],
+          "env": [
+            {
+              "name": "CLOUD_PROVIDER",
+              "value": "gcp"
+            },
+            {
+              "name": "PROJECT_ID",
+              "value": "itcs355-6688165"
+            },
+            {
+              "name": "REGION",
+              "value": "asia-southeast1"
+            },
+            {
+              "name": "BLOB_URI",
+              "value": "gs://itcs355-6688165/itcs355"
+            },
+            {
+              "name": "CONTAINER_REGISTRY",
+              "value": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355"
+            },
+            {
+              "name": "MLFLOW_TRACKING_URI",
+              "value": "sqlite:///mlflow.db"
+            },
+            {
+              "name": "MODEL_REGISTRY_NAME",
+              "value": "itcs355-6688165"
+            },
+            {
+              "name": "IDENTITY_REF",
+              "value": "training-runtime@itcs355-6688165.iam.gserviceaccount.com"
+            },
+            {
+              "name": "SERVE_IMAGE_URI",
+              "value": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-serve@sha256:0483b0523045bdaf7d61dd9a6781c6a018a4b106572df7d3c449c0ed28454dc5"
+            },
+            {
+              "name": "LAB",
+              "value": "5"
+            },
+            {
+              "name": "GIT_COMMIT",
+              "value": "7a2ff14176af2b9b84633ad883c71fd0e1b755e5"
+            }
+          ],
+          "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:552f9c98c4e6567b33bbd38470768e588fb2e5c780716580a4c4d22344620376"
+        }
+      },
+      "exec-sh-3": {
+        "container": {
+          "args": [
+            "{{$.inputs.parameters['script']}}",
+            "step",
+            "{{$.outputs.parameters['out'].output_file}}",
+            "{{$.inputs.parameters['a']}}",
+            "{{$.inputs.parameters['b']}}"
+          ],
+          "command": [
+            "/bin/sh",
+            "-c"
+          ],
+          "env": [
+            {
+              "name": "CLOUD_PROVIDER",
+              "value": "gcp"
+            },
+            {
+              "name": "PROJECT_ID",
+              "value": "itcs355-6688165"
+            },
+            {
+              "name": "REGION",
+              "value": "asia-southeast1"
+            },
+            {
+              "name": "BLOB_URI",
+              "value": "gs://itcs355-6688165/itcs355"
+            },
+            {
+              "name": "CONTAINER_REGISTRY",
+              "value": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355"
+            },
+            {
+              "name": "MLFLOW_TRACKING_URI",
+              "value": "sqlite:///mlflow.db"
+            },
+            {
+              "name": "MODEL_REGISTRY_NAME",
+              "value": "itcs355-6688165"
+            },
+            {
+              "name": "IDENTITY_REF",
+              "value": "training-runtime@itcs355-6688165.iam.gserviceaccount.com"
+            },
+            {
+              "name": "SERVE_IMAGE_URI",
+              "value": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-serve@sha256:0483b0523045bdaf7d61dd9a6781c6a018a4b106572df7d3c449c0ed28454dc5"
+            },
+            {
+              "name": "LAB",
+              "value": "5"
+            },
+            {
+              "name": "GIT_COMMIT",
+              "value": "7a2ff14176af2b9b84633ad883c71fd0e1b755e5"
+            }
+          ],
+          "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:552f9c98c4e6567b33bbd38470768e588fb2e5c780716580a4c4d22344620376",
+          "resources": {
+            "cpuLimit": 4.0,
+            "memoryLimit": 8.0,
+            "resourceCpuLimit": "4",
+            "resourceMemoryLimit": "8G"
+          }
+        }
+      },
+      "exec-sh-4": {
+        "container": {
+          "args": [
+            "{{$.inputs.parameters['script']}}",
+            "step",
+            "{{$.outputs.parameters['out'].output_file}}",
+            "{{$.inputs.parameters['a']}}",
+            "{{$.inputs.parameters['b']}}"
+          ],
+          "command": [
+            "/bin/sh",
+            "-c"
+          ],
+          "env": [
+            {
+              "name": "CLOUD_PROVIDER",
+              "value": "gcp"
+            },
+            {
+              "name": "PROJECT_ID",
+              "value": "itcs355-6688165"
+            },
+            {
+              "name": "REGION",
+              "value": "asia-southeast1"
+            },
+            {
+              "name": "BLOB_URI",
+              "value": "gs://itcs355-6688165/itcs355"
+            },
+            {
+              "name": "CONTAINER_REGISTRY",
+              "value": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355"
+            },
+            {
+              "name": "MLFLOW_TRACKING_URI",
+              "value": "sqlite:///mlflow.db"
+            },
+            {
+              "name": "MODEL_REGISTRY_NAME",
+              "value": "itcs355-6688165"
+            },
+            {
+              "name": "IDENTITY_REF",
+              "value": "training-runtime@itcs355-6688165.iam.gserviceaccount.com"
+            },
+            {
+              "name": "SERVE_IMAGE_URI",
+              "value": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-serve@sha256:0483b0523045bdaf7d61dd9a6781c6a018a4b106572df7d3c449c0ed28454dc5"
+            },
+            {
+              "name": "LAB",
+              "value": "5"
+            },
+            {
+              "name": "GIT_COMMIT",
+              "value": "7a2ff14176af2b9b84633ad883c71fd0e1b755e5"
+            }
+          ],
+          "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:552f9c98c4e6567b33bbd38470768e588fb2e5c780716580a4c4d22344620376"
+        }
+      },
+      "exec-sh-5": {
+        "container": {
+          "args": [
+            "{{$.inputs.parameters['script']}}",
+            "step",
+            "{{$.outputs.parameters['out'].output_file}}",
+            "{{$.inputs.parameters['a']}}",
+            "{{$.inputs.parameters['b']}}"
+          ],
+          "command": [
+            "/bin/sh",
+            "-c"
+          ],
+          "env": [
+            {
+              "name": "CLOUD_PROVIDER",
+              "value": "gcp"
+            },
+            {
+              "name": "PROJECT_ID",
+              "value": "itcs355-6688165"
+            },
+            {
+              "name": "REGION",
+              "value": "asia-southeast1"
+            },
+            {
+              "name": "BLOB_URI",
+              "value": "gs://itcs355-6688165/itcs355"
+            },
+            {
+              "name": "CONTAINER_REGISTRY",
+              "value": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355"
+            },
+            {
+              "name": "MLFLOW_TRACKING_URI",
+              "value": "sqlite:///mlflow.db"
+            },
+            {
+              "name": "MODEL_REGISTRY_NAME",
+              "value": "itcs355-6688165"
+            },
+            {
+              "name": "IDENTITY_REF",
+              "value": "training-runtime@itcs355-6688165.iam.gserviceaccount.com"
+            },
+            {
+              "name": "SERVE_IMAGE_URI",
+              "value": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-serve@sha256:0483b0523045bdaf7d61dd9a6781c6a018a4b106572df7d3c449c0ed28454dc5"
+            },
+            {
+              "name": "LAB",
+              "value": "5"
+            },
+            {
+              "name": "GIT_COMMIT",
+              "value": "7a2ff14176af2b9b84633ad883c71fd0e1b755e5"
+            }
+          ],
+          "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:552f9c98c4e6567b33bbd38470768e588fb2e5c780716580a4c4d22344620376"
+        }
+      },
+      "exec-sh-6": {
+        "container": {
+          "args": [
+            "{{$.inputs.parameters['script']}}",
+            "step",
+            "{{$.outputs.parameters['out'].output_file}}",
+            "{{$.inputs.parameters['a']}}",
+            "{{$.inputs.parameters['b']}}"
+          ],
+          "command": [
+            "/bin/sh",
+            "-c"
+          ],
+          "env": [
+            {
+              "name": "CLOUD_PROVIDER",
+              "value": "gcp"
+            },
+            {
+              "name": "PROJECT_ID",
+              "value": "itcs355-6688165"
+            },
+            {
+              "name": "REGION",
+              "value": "asia-southeast1"
+            },
+            {
+              "name": "BLOB_URI",
+              "value": "gs://itcs355-6688165/itcs355"
+            },
+            {
+              "name": "CONTAINER_REGISTRY",
+              "value": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355"
+            },
+            {
+              "name": "MLFLOW_TRACKING_URI",
+              "value": "sqlite:///mlflow.db"
+            },
+            {
+              "name": "MODEL_REGISTRY_NAME",
+              "value": "itcs355-6688165"
+            },
+            {
+              "name": "IDENTITY_REF",
+              "value": "training-runtime@itcs355-6688165.iam.gserviceaccount.com"
+            },
+            {
+              "name": "SERVE_IMAGE_URI",
+              "value": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-serve@sha256:0483b0523045bdaf7d61dd9a6781c6a018a4b106572df7d3c449c0ed28454dc5"
+            },
+            {
+              "name": "LAB",
+              "value": "5"
+            },
+            {
+              "name": "GIT_COMMIT",
+              "value": "7a2ff14176af2b9b84633ad883c71fd0e1b755e5"
+            }
+          ],
+          "image": "asia-southeast1-docker.pkg.dev/itcs355-6688165/itcs355/itcs355-lab1@sha256:552f9c98c4e6567b33bbd38470768e588fb2e5c780716580a4c4d22344620376"
+        }
+      }
+    }
+  },
+  "pipelineInfo": {
+    "name": "itcs355-training-pipeline"
+  },
+  "root": {
+    "dag": {
+      "tasks": {
+        "condition-1": {
+          "componentRef": {
+            "name": "comp-condition-1"
+          },
+          "dependentTasks": [
+            "sh-4"
+          ],
+          "inputs": {
+            "parameters": {
+              "pipelinechannel--sh-4-out": {
+                "taskOutputParameter": {
+                  "outputParameterKey": "out",
+                  "producerTask": "sh-4"
+                }
+              }
+            }
+          },
+          "taskInfo": {
+            "name": "condition-1"
+          },
+          "triggerPolicy": {
+            "condition": "inputs.parameter_values['pipelinechannel--sh-4-out'] == 'pass'"
+          }
+        },
+        "sh": {
+          "cachingOptions": {
+            "enableCache": true
+          },
+          "componentRef": {
+            "name": "comp-sh"
+          },
+          "inputs": {
+            "parameters": {
+              "a": {
+                "runtimeValue": {
+                  "constant": "-"
+                }
+              },
+              "b": {
+                "runtimeValue": {
+                  "constant": "-"
+                }
+              },
+              "script": {
+                "runtimeValue": {
+                  "constant": "mkdir -p \"$(dirname \"$1\")\" && dvc pull && test -s data/raw/sensors.csv && sha256sum data/raw/sensors.csv > \"$1\""
+                }
+              }
+            }
+          },
+          "taskInfo": {
+            "name": "ingest"
+          }
+        },
+        "sh-2": {
+          "cachingOptions": {
+            "enableCache": true
+          },
+          "componentRef": {
+            "name": "comp-sh-2"
+          },
+          "dependentTasks": [
+            "sh"
+          ],
+          "inputs": {
+            "parameters": {
+              "a": {
+                "runtimeValue": {
+                  "constant": "-"
+                }
+              },
+              "b": {
+                "runtimeValue": {
+                  "constant": "-"
+                }
+              },
+              "script": {
+                "runtimeValue": {
+                  "constant": "mkdir -p \"$(dirname \"$1\")\" && dvc pull && test -s data/raw/sensors.csv && { python -m pytest -q -rs tests/test_data.py > /tmp/t.txt 2>&1; rc=$?; cat /tmp/t.txt; [ $rc -eq 0 ] && ! grep -qi skipped /tmp/t.txt && echo ok > \"$1\"; }"
+                }
+              }
+            }
+          },
+          "taskInfo": {
+            "name": "validate"
+          }
+        },
+        "sh-3": {
+          "cachingOptions": {
+            "enableCache": true
+          },
+          "componentRef": {
+            "name": "comp-sh-3"
+          },
+          "dependentTasks": [
+            "sh-2"
+          ],
+          "inputs": {
+            "parameters": {
+              "a": {
+                "runtimeValue": {
+                  "constant": "/gcs/itcs355-6688165/itcs355/lab5/runs/{{$.pipeline_job_uuid}}"
+                }
+              },
+              "b": {
+                "runtimeValue": {
+                  "constant": "-"
+                }
+              },
+              "script": {
+                "runtimeValue": {
+                  "constant": "mkdir -p \"$(dirname \"$1\")\" && dvc pull && python -m src.train --no-track --metrics-out \"$2/metrics.json\" --model-out \"$2/model\" && echo done > \"$1\""
+                }
+              }
+            }
+          },
+          "taskInfo": {
+            "name": "train"
+          }
+        },
+        "sh-4": {
+          "cachingOptions": {
+            "enableCache": true
+          },
+          "componentRef": {
+            "name": "comp-sh-4"
+          },
+          "dependentTasks": [
+            "sh-3"
+          ],
+          "inputs": {
+            "parameters": {
+              "a": {
+                "runtimeValue": {
+                  "constant": "/gcs/itcs355-6688165/itcs355/lab5/runs/{{$.pipeline_job_uuid}}"
+                }
+              },
+              "b": {
+                "componentInputParameter": "incumbent_arg"
+              },
+              "script": {
+                "runtimeValue": {
+                  "constant": "mkdir -p \"$(dirname \"$1\")\" && python scripts/evaluation_gate.py --metrics \"$2/metrics.json\" $3 --decision-out \"$1\"; tr -d \"[:space:]\" < \"$1\" > /tmp/d && cp /tmp/d \"$1\""
+                }
+              }
+            }
+          },
+          "taskInfo": {
+            "name": "evaluate"
+          }
+        }
+      }
+    },
+    "inputDefinitions": {
+      "parameters": {
+        "incumbent_arg": {
+          "defaultValue": "--incumbent-alias staging",
+          "isOptional": true,
+          "parameterType": "STRING"
+        }
+      }
+    }
+  },
+  "schemaVersion": "2.1.0",
+  "sdkVersion": "kfp-2.17.0"
+}

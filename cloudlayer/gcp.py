@@ -374,9 +374,9 @@ class GcpAdapter(CloudAdapter):
         import os
 
         local_tag = os.environ.get("SERVE_IMAGE")
-        if not local_tag:
+        if not local_tag and not os.environ.get("SERVE_IMAGE_URI"):
             raise RuntimeError("set SERVE_IMAGE=itcs355-serve:<tag> (make deploy does this)")
-        image = self.push_image(local_tag)  # digest-pinned reference
+        image = os.environ.get("SERVE_IMAGE_URI") or self.push_image(local_tag)
         cpu, _, memory = instance.partition("/")
 
         slots = ("CLOUD_PROVIDER", "PROJECT_ID", "REGION", "BLOB_URI", "CONTAINER_REGISTRY",
@@ -386,7 +386,7 @@ class GcpAdapter(CloudAdapter):
         env["MODEL_ARTIFACT_URI"] = self._model_artifact_uri(
             env["MODEL_REGISTRY_NAME"], model_ref).rstrip("/") + "/model.joblib"
         labels = ",".join(f"{self._label(k)}={self._label(v)}"
-                          for k, v in self.cfg.tags(3).items())
+                          for k, v in self.cfg.tags(int(os.environ.get("LAB", "3"))).items())
 
         try:
             self._service_url(endpoint)
@@ -396,7 +396,7 @@ class GcpAdapter(CloudAdapter):
 
         args = [
             "deploy", endpoint, "--image", image,
-            "--service-account", self.cfg.identity_ref,
+            "--service-account", os.environ.get("SERVING_SA", self.cfg.identity_ref),
             "--set-env-vars", ",".join(f"{k}={v}" for k, v in env.items()),
             "--cpu", cpu, "--memory", memory, "--port", "8080",
             "--min-instances", os.environ.get("SERVE_MIN_INSTANCES", "0"), "--max-instances", "3",
