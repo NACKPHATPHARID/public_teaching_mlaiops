@@ -300,3 +300,11 @@ Things that went wrong on the way:
 - Run 1 failed because the training service account did not have the Vertex AI permission. I added it.
 - Run 2 skipped training because Vertex reused a cached result, so the gate could not find its files. I turned caching off for every step.
 - Run 3 failed because gcloud inside the container did not know the project. I set CLOUDSDK_CORE_PROJECT.
+
+## Lab 5: cost report (Task 5)
+
+The full report is reports/lab5-cost.md. Short version: I estimated 47 THB before running (reports/lab5-estimate.md) and billing, filtered by the lab=5 label, shows 4.92 THB before credits. My estimate was about 9 times too high. The main reasons were that I assumed 12 pipeline runs and only 4 happened, and that the machines ran for minutes, not hours. The report has the breakdown, the cost per 1,000 predictions at 5, 25 and 80 percent busy, and the one optimisation I applied (shorter LLM answers with an output cap, 5.03 to 4.23 THB per 1,000 requests with the gate still passing). I did not change the estimate afterwards. The whole term cost about 24 THB before credits, and I paid 0 because of the free trial credit.
+
+## Lab 5: teardown (Task 6)
+
+I ran make teardown LAB=5 and it found nothing tagged lab=5 left. Then I checked by hand, because an untagged resource would not show up there: no Cloud Run services and no Vertex endpoints. Screenshot right after: reports/lab5/task6-teardown-empty.png (21 Oct 16:30). The same checks about 26 hours later: reports/lab5/task6-teardown-24h.png (22 Oct 18:16). What is still there is only storage: two image repositories in Artifact Registry and the course bucket, which cost a few baht a month.
