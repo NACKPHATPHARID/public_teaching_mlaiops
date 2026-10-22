@@ -28,6 +28,7 @@ PRICE_TABLE: dict[str, dict[str, float]] = {
         "n1-standard-4": 7.6,
         "e2-standard-4": 6.4,
         "n1-standard-4+t4": 25.2,
+        "cloud-run-1vcpu-1gib": 4.5,  # from Lab 5 billing, checked 2026-10-22
     },
 }
 
