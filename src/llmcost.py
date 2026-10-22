@@ -41,7 +41,7 @@ TOKEN_PRICE_TABLE: dict[str, dict[str, tuple[float, float]]] = {
         "large": (550.0, 2750.0),
     },
     "gcp": {
-        "small": (8.5, 34.0),
+        "small": (8.33, 50.0),  # gemini-3.1-flash-lite, global, $0.25 in / $1.50 out per 1M, checked 2026-10-21, 33.33 THB/USD
         "medium": (105.0, 525.0),
         "large": (525.0, 2625.0),
     },

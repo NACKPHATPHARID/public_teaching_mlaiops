@@ -1,0 +1,1 @@
+https://itcs355-lab5-staging-wbdtxulxia-as.a.run.app	serving-runtime@itcs355-6688165.iam.gserviceaccount.com	cloud.googleapis.com/location=asia-southeast1;course=itcs355;lab=5;run.googleapis.com/satisfiesPzs=true;student=itcs355-6688165

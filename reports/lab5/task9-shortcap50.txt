@@ -1,0 +1,26 @@
+golden set  machine-triage.jsonl  (15 cases)
+  [PASS] mt-01
+  [PASS] mt-02
+  [PASS] mt-03
+  [PASS] mt-04
+  [PASS] mt-05
+  [PASS] mt-06
+  [PASS] mt-07
+  [PASS] mt-08
+  [PASS] mt-09
+  [PASS] mt-10
+  [PASS] mt-11
+  [PASS] mt-12
+  [PASS] mt-13
+  [PASS] mt-14
+  [PASS] mt-15
+
+pass rate           15/15  (100.0%)
+p95 latency         1474 ms
+cost per 1k reqs    4.2322 THB  (gcp/small)
+wrote reports/llm_eval-machine-shortcap50.json
+
+baseline pass rate  1.0
+current  pass rate  1.0
+
+GATE PASSED — no case that passed before fails now

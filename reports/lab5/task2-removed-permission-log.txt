@@ -1,0 +1,44 @@
+	
+Starting new instance. Reason: DEPLOYMENT_ROLLOUT - Instance started due to traffic shifting between revisions due to deployment, traffic split adjustment, or deployment health check.	
+INFO:     Uvicorn running on http://0.0.0.0:8080 (Press CTRL+C to quit)	
+INFO:     Started parent process [1]	
+INFO:     Started server process [4]	
+INFO:     Started server process [3]	
+INFO:     Waiting for application startup.	
+INFO:     Waiting for application startup.	
+	
+	
+INFO:     Application startup complete.	
+INFO:     Application startup complete.	
+	
+INFO:     169.254.169.126:22655 - "GET /ready HTTP/1.1" 503 Service Unavailable	
+	
+INFO:     169.254.169.126:5405 - "GET /ready HTTP/1.1" 503 Service Unavailable	
+	
+INFO:     169.254.169.126:11495 - "GET /ready HTTP/1.1" 503 Service Unavailable	
+	
+INFO:     169.254.169.126:14815 - "GET /ready HTTP/1.1" 503 Service Unavailable	
+	
+INFO:     169.254.169.126:36861 - "GET /ready HTTP/1.1" 503 Service Unavailable	
+	
+INFO:     169.254.169.126:49201 - "GET /ready HTTP/1.1" 503 Service Unavailable	
+	
+INFO:     169.254.169.126:6295 - "GET /ready HTTP/1.1" 503 Service Unavailable	
+	
+INFO:     169.254.169.126:9485 - "GET /ready HTTP/1.1" 503 Service Unavailable	
+	
+INFO:     169.254.169.126:38217 - "GET /ready HTTP/1.1" 503 Service Unavailable	
+	
+INFO:     169.254.169.126:18097 - "GET /ready HTTP/1.1" 503 Service Unavailable	
+	
+INFO:     169.254.169.126:4835 - "GET /ready HTTP/1.1" 503 Service Unavailable	
+	
+INFO:     169.254.169.126:44877 - "GET /ready HTTP/1.1" 503 Service Unavailable	
+	
+INFO:     169.254.169.126:39995 - "GET /ready HTTP/1.1" 503 Service Unavailable	
+	
+INFO:     169.254.169.126:24131 - "GET /ready HTTP/1.1" 503 Service Unavailable	
+STARTUP HTTP probe failed 60 times consecutively for container "itcs355-serve-1" on port 8080 path "/ready". The instance was not started.
+HTTP request returned status 503 Service Unavailable.
+Contents: {"status":"not_ready","reason":"model not loaded"}	
+	

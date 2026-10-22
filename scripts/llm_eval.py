@@ -181,11 +181,20 @@ def main() -> int:
     ap.add_argument("--out", type=Path, default=ROOT / "reports" / "llm_eval.json")
     ap.add_argument("--baseline", type=Path,
                     help="a previous report; fail if any case regresses against it")
+    ap.add_argument("--system", type=Path, help="system prompt file, used with --live")
+    ap.add_argument("--temperature", type=float, default=0.0)
+    ap.add_argument("--max-output-tokens", type=int, default=200)
+    ap.add_argument("--gen-model", default="gemini-3.1-flash-lite")
+    ap.add_argument("--save-responses", type=Path, help="write live answers to a jsonl")
     args = ap.parse_args()
 
     golden = read_jsonl(args.golden)
     if args.live:
-        responses = generate_live(golden)
+        responses = generate_live(golden, live_params(args))
+        if args.save_responses:
+            args.save_responses.parent.mkdir(parents=True, exist_ok=True)
+            args.save_responses.write_text(
+                "".join(json.dumps(r) + "\n" for r in responses))
     else:
         responses = read_jsonl(args.responses)
 
@@ -212,7 +221,15 @@ def main() -> int:
     return 0
 
 
-def generate_live(golden: list[dict]) -> list[dict]:
+def live_params(args) -> dict:
+    params = {"max_output_tokens": args.max_output_tokens,
+              "temperature": args.temperature, "model": args.gen_model}
+    if args.system:
+        params["system"] = args.system.read_text()
+    return params
+
+
+def generate_live(golden: list[dict], params: dict) -> list[dict]:
     """TODO(Lab 5): route each prompt through your adapter's `generate`.
 
     Record input_tokens, output_tokens and latency_ms from the provider's own usage
@@ -225,7 +242,7 @@ def generate_live(golden: list[dict]) -> list[dict]:
     adapter = get_adapter(config.load())
     rows = []
     for case in golden:
-        result = adapter.generate(case["prompt"], {"max_output_tokens": 200})
+        result = adapter.generate(case["prompt"], params)
         rows.append({"id": case["id"], **result})
     return rows
 

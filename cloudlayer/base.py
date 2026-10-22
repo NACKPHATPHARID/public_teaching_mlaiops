@@ -62,6 +62,10 @@ class CloudAdapter(ABC):
         raise NotImplementedError("Lab 4")
 
     # --- Lab 5 ---------------------------------------------------------------
+    def get_model_metric(self, name: str, alias: str, key: str = "metric_test") -> float | None:
+        """Score of the model version that carries `alias`, or None if no version has it."""
+        raise NotImplementedError("Lab 5")
+
     def generate(self, prompt: str, params: dict[str, Any]) -> dict[str, Any]:
         """Call a managed LLM endpoint once. Returns at least:
 

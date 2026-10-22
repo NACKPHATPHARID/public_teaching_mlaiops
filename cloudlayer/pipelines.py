@@ -53,7 +53,8 @@ def compile_gcp(spec: dict[str, Any]):
     dsl.If blocks. The compiled artifact is a JSON file you submit, so your build step
     produces a file rather than an object — different from the other two.
     """
-    raise NotImplementedError("TODO Lab 5: compile a KFP pipeline and submit to Vertex")
+    from cloudlayer.vertex_pipeline import compile_and_submit
+    return compile_and_submit(spec)
 
 
 COMPILERS = {"aws": compile_aws, "azure": compile_azure, "gcp": compile_gcp}

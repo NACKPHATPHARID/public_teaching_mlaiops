@@ -374,9 +374,9 @@ class GcpAdapter(CloudAdapter):
         import os
 
         local_tag = os.environ.get("SERVE_IMAGE")
-        if not local_tag:
+        if not local_tag and not os.environ.get("SERVE_IMAGE_URI"):
             raise RuntimeError("set SERVE_IMAGE=itcs355-serve:<tag> (make deploy does this)")
-        image = self.push_image(local_tag)  # digest-pinned reference
+        image = os.environ.get("SERVE_IMAGE_URI") or self.push_image(local_tag)
         cpu, _, memory = instance.partition("/")
 
         slots = ("CLOUD_PROVIDER", "PROJECT_ID", "REGION", "BLOB_URI", "CONTAINER_REGISTRY",
@@ -386,7 +386,7 @@ class GcpAdapter(CloudAdapter):
         env["MODEL_ARTIFACT_URI"] = self._model_artifact_uri(
             env["MODEL_REGISTRY_NAME"], model_ref).rstrip("/") + "/model.joblib"
         labels = ",".join(f"{self._label(k)}={self._label(v)}"
-                          for k, v in self.cfg.tags(3).items())
+                          for k, v in self.cfg.tags(int(os.environ.get("LAB", "3"))).items())
 
         try:
             self._service_url(endpoint)
@@ -396,7 +396,7 @@ class GcpAdapter(CloudAdapter):
 
         args = [
             "deploy", endpoint, "--image", image,
-            "--service-account", self.cfg.identity_ref,
+            "--service-account", os.environ.get("SERVING_SA", self.cfg.identity_ref),
             "--set-env-vars", ",".join(f"{k}={v}" for k, v in env.items()),
             "--cpu", cpu, "--memory", memory, "--port", "8080",
             "--min-instances", os.environ.get("SERVE_MIN_INSTANCES", "0"), "--max-instances", "3",
@@ -518,3 +518,73 @@ class GcpAdapter(CloudAdapter):
             if not page_token:
                 break
         return out
+
+    def get_model_metric(self, name: str, alias: str, key: str = "metric_test") -> float | None:
+        """Read `key` for the Vertex model version that carries `alias`. GCP mangles the
+        label copy ('0.8533' becomes '0-8533'), so read the exact value from the version
+        description. Returns None when no version has the alias."""
+        import json as _json
+
+        parent = self._find_model(name)
+        if not parent:
+            return None
+        model_id = str(parent).split("/")[-1].split("@")[0]
+        out = subprocess.run(
+            ["gcloud", "ai", "models", "list-version", model_id,
+             "--region", self.cfg.region, "--format=json"],
+            capture_output=True, text=True, check=True)
+        for version in _json.loads(out.stdout):
+            if alias in version.get("versionAliases", []):
+                for line in version.get("versionDescription", "").splitlines():
+                    if line.startswith(f"{key}="):
+                        return float(line.split("=", 1)[1])
+        return None
+
+    def generate(self, prompt: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+        """One call to a Gemini model on Vertex AI (global endpoint).
+
+        params: model, max_output_tokens, temperature, system (a system prompt string).
+        Token counts are the provider's own usageMetadata, never estimated.
+        """
+        import time
+        import urllib.error
+        import urllib.request
+
+        params = params or {}
+        model = params.get("model", "gemini-3.1-flash-lite")
+        body: dict[str, Any] = {
+            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+            "generationConfig": {
+                "maxOutputTokens": int(params.get("max_output_tokens", 200)),
+                "temperature": float(params.get("temperature", 0.0)),
+            },
+        }
+        if params.get("system"):
+            body["systemInstruction"] = {"parts": [{"text": params["system"]}]}
+        url = ("https://aiplatform.googleapis.com/v1/projects/"
+               f"{self.cfg.project_id}/locations/global/publishers/google/models/{model}:generateContent")
+        req = urllib.request.Request(url, data=json.dumps(body).encode(), method="POST", headers={
+            "Authorization": f"Bearer {self._access_token()}", "Content-Type": "application/json"})
+        data = {}
+        latency_ms = 0
+        for attempt in range(6):
+            start = time.time()
+            try:
+                with urllib.request.urlopen(req, timeout=60) as resp:
+                    data = json.loads(resp.read())
+                latency_ms = int((time.time() - start) * 1000)
+                break
+            except urllib.error.HTTPError as err:
+                # 429 = rate limited, 503 = busy. Wait longer each time, then give up.
+                if err.code not in (429, 503) or attempt == 5:
+                    raise
+                time.sleep(2 ** attempt)
+
+        parts = (data.get("candidates") or [{}])[0].get("content", {}).get("parts", [])
+        usage = data.get("usageMetadata", {})
+        return {
+            "response": "".join(p.get("text", "") for p in parts),
+            "input_tokens": usage.get("promptTokenCount", 0),
+            "output_tokens": usage.get("candidatesTokenCount", 0) + usage.get("thoughtsTokenCount", 0),
+            "latency_ms": latency_ms,
+        }
